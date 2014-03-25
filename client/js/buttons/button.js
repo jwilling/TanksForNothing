@@ -3,9 +3,9 @@ var myButton = me.GUI_Object.extend(
    init:function(x, y)
    {
       settings = {}
-      settings.image = "button";
-      settings.spritewidth = 100;
-      settings.spriteheight = 50;
+      settings.image = me.loader.getImage("button");
+      settings.spritewidth = 1326;
+      settings.spriteheight = 995;
       // parent constructor
       this.parent(x, y, settings);
    },
@@ -14,8 +14,12 @@ var myButton = me.GUI_Object.extend(
    // when the object is clicked
    onClick:function(event)
    {
-      console.log("clicked!");
+      me.state.change(me.state.PLAY);
       // don't propagate the event
-      return false;
+      return true;
+   },
+   
+   draw : function(context) {
+   		context.drawImage(settings.image, 0,0);
    }
 });
