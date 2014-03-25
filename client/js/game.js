@@ -7,7 +7,7 @@ var game = {
 			alert("Your browser does not support HTML5 canvas.");
 			return;
 		}
-	
+		
 		// Set a callback to run when loading is complete.
 		me.loader.onload = this.loaded.bind(this);
 
@@ -22,8 +22,16 @@ var game = {
 	"loaded" : function () {
 		me.state.set(me.state.MENU, new game.TitleScreen());
 		// see here for more state: http://melonjs.github.io/docs/me.state.html
+		me.state.set(me.state.PLAY, new game.PlayScreen());
+			
+		// add the object at pos (10,10), z index 4
+		//me.game.add((new myButton(10,10)),4);
+
+		
+
 
 		// Show the title screen.
 		me.state.change(me.state.MENU);
+		
 	}
 };
