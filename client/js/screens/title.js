@@ -6,6 +6,12 @@ game.TitleScreen = me.ScreenObject.extend({
 
 		// title screen image
 		this.title = null;
+		
+		//Any key press causes game to proceed to menu.
+		window.addEventListener('keydown', function(e){
+			window.removeEventListener('keydown', function(e){}, false);
+			me.state.change(me.state.PLAY);
+		}, false);
 	},
 	/**	
 	 *  action to perform on state change
@@ -23,6 +29,7 @@ game.TitleScreen = me.ScreenObject.extend({
 	},
 	
 	update : function() {
+		
 		if (me.input.isKeyPressed('left')) {
 			me.state.change(me.state.PLAY);
 		}
