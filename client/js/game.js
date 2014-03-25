@@ -24,12 +24,6 @@ var game = {
 		// see here for more state: http://melonjs.github.io/docs/me.state.html
 		me.state.set(me.state.PLAY, new game.PlayScreen());
 			
-		// add the object at pos (10,10), z index 4
-		//me.game.add((new myButton(10,10)),4);
-
-		
-
-
 		// Show the title screen.
 		me.state.change(me.state.MENU);
 		

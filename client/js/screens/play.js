@@ -22,7 +22,7 @@ game.PlayScreen = me.ScreenObject.extend({
 		//me.game.world.addChild(this.HUD);
 		
 		if (this.title == null) {
-      	this.title = me.loader.getImage("playTestScreen");
+      	this.title = me.loader.getImage("Countdown");
       	}
 
 	},
