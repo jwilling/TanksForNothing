@@ -2,7 +2,89 @@ var util = require("util");
 var io = require("socket.io");
 
 var socket;
-var players;
+var players; //maps player ids to player;
+var sessions;
+
+function makeid()
+{
+    var text = "";
+    var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 8; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
+function Player(playerID){
+	this.playerID = playerID;
+	this.locX = 0;
+	this.locY = 0;
+	this.bodyDirection = 0;
+	this.turretDirection = 0;
+	this.HP = 100;
+	this.inv = new Date().getTime() + 3000;
+	this.kills = 0;
+	this.deaths = 0;
+	this.chargeShotStart = 0;
+	this.ready = false;
+};
+
+function Shot(playerID, damage, direction){
+	this.locX = players.playerID.locX;
+	this.locY = players.playerID.locY;
+	this.playerID = playerID;
+	this.damage = damage;
+	this.direction = direction;
+};
+
+function GameEnv(){
+	this.players = {};
+	this.shots = [];
+};
+
+GameEnv.prototype.addPlayer = function(playerID){
+	this.players[playerID] = Player();
+};
+
+GameEnv.prototype.removePlayer = function(playerID){
+	delete players[playerID];
+};
+
+GameEnv.prototype.moveBody = function(playerID, locX, locY){
+	this.players[playerID].locx = locX;
+	this.players[playerID].locy = locY;
+};
+
+GameEnv.prototype.rotateBody = function(playerID, newDegreeDirection){
+	var oldDirection = this.players[playerID].bodyDirection;
+	this.players[playerID].bodyDirection = rads;
+	this.players[playerID].turretDirection = this.players[playerID].turretDirection - (rads-oldDirection);
+};
+
+GameEnv.prototype.rotateTurret = function(playerID, newDegreeDirection){
+	this.players[playerID].turretDirection = rads;
+};
+
+GameEnv.prototype.shoot = function(playerID, directionInDegrees){
+	var shot = new Shot(playerID, 10, directionInDegrees);
+	this.shots.push(shot);
+};
+
+var sessionStates = {"acceptingPlayers":0 , "waitingStart":1, "waitingAllReady":2, "inGame":3, "displayingScores": 4 };
+
+function Session(settings){
+	this.sessionID = makeid();
+	this.settings = settings;
+	this.gameEnv = new GameEnv();
+	this.state = sessionStates["acceptingPlayers"];
+};
+
+Session.prototype.newGame = function(){
+	this.gameEnv = new GameEnv();
+};
+
+var testSession = Session({});
 
 function init(){
 	players = [];
@@ -15,62 +97,77 @@ function init(){
 }
 
 var setEventHandlers = function() { 
-	socket.sockets.on("connect", onSocketConnection);
-	socket.sockets.on("disconnect", onSocketDisconnect);
-}
-	
-function onSocketConnection(client) {
-    util.log("New player has connected: "+client.id);
-    client.on("disconnect", onClientDisconnect);
-	client.on("host_game", onClientHostGame);
-	client.on("start_game", onClientStartGame);
-	client.on("ready_game", onClientReadyGame);
-	client.on("exit_game", onClientExitGame);
-	client.on("join_game", onClientJoinGame);
-	client.on("move_body", onClientMoveBody);
-	client.on("rotate_body", onClientRotateBody);
-	client.on("rotate_turret", onClientRotateTurret);
-	client.on("start_charge", onClientStartCharge);
-	client.on("end_charge", onClientEndCharge);
+	socket.sockets.on("connection", function(client){
+		client.on("host_game", function(data){
+			onClientHostGame(client, data);
+		});	
+		client.on("ready_game", function(data){
+			onClientReadyGame(client, data);
+		});
+		client.on("exit_game", function(data){
+			onClientExitGame(client, data);
+		});
+		client.on("join_game", function(data){
+			onClientJoinGame(client, data);
+		});
+		client.on("move_body", function(data){
+			onClientMoveBody(client, data);
+		});
+		client.on("rotate_body", function(data){
+			onClientRotateBody(client, data);
+		});
+		client.on("rotate_turret", function(data){
+			onClientRotateTurret(client, data);
+		});
+		client.on("start_charge", function(data){
+			onClientStartCharge(client, data);
+		});
+		client.on("end_charge", function(data){
+			onClientEndCharge(client, data)
+		});
+	});
+	//socket.sockets.on("disconnection", onSocketDisconnect);
+};
+
+
+function onClientStartGame(client, data){
+	console.log("Client Starting Game");
 }
 
-function onSocketConnected() {
-    console.log("Connected to socket server");
+function onClientReadyGame(client, data){
+	console.log("Client Starting Game");
 }
 
-function onSocketDisconnect() {
-    console.log("Disconnected from socket server");
-}
-
-function onClientHostGame(data){
+function onClientHostGame(client, data){
 	console.log("Client Hosting Game");
+	client.emit("hello", data);
 }
 
-function onClientExitGame(data){
+function onClientExitGame(client, data){
 	console.log("Client Exiting Game");
 }
 
-function onClientJoinGame(data){
+function onClientJoinGame(client, data){
 	console.log("Client Joining Game");
 }
 
-function onClientMoveBody(data){
+function onClientMoveBody(client, data){
 	console.log("Client Moving Body");
 }
 
-function onClientRotateBody(data){
+function onClientRotateBody(client, data){
 	console.log("Client Rotating Body");
 }
 
-function onClientRotateTurret(data){
+function onClientRotateTurret(client, data){
 	console.log("Client Rotating Turret");
 }
 
-function onClientStartCharge(data){
+function onClientStartCharge(client, data){
 	console.log("Client Starting Charge");
 }
 
-function onClientEndCharge(data){
+function onClientEndCharge(client, data){
 	console.log("Client Ending Charge");
 }
 
