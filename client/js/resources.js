@@ -4,6 +4,16 @@ game.resources = [
 	 * @example
 	 * {name: "example", type:"image", src: "data/img/example.png"},
 	 */
+	{ name: "title-background", type: "image", src: "data/img/sliced/title-background.png" },
+	{ name: "background", type: "image", src: "data/img/sliced/background.png" },
+	
+	// Main menu buttons.
+	{ name: "menu-button-credits", type: "image", src: "data/img/sliced/menu-button-credits.png" },
+	{ name: "menu-button-new-game", type: "image", src: "data/img/sliced/menu-button-new-game.png" },
+	{ name: "menu-button-options", type: "image", src: "data/img/sliced/menu-button-options.png" },
+	{ name: "menu-button-tutorial", type: "image", src: "data/img/sliced/menu-button-tutorial.png" },
+	
+	
 	{name: "area01_level_tiles", type:"image", src: "data/img/map/area01_level_tiles.png"},
 	{name: "gripe_run_right", type:"image", src: "data/img/sprite/gripe_run_right.png"},
     {name: "spinning_coin_gold",  type:"image", src: "data/img/sprite/spinning_coin_gold.png"},
