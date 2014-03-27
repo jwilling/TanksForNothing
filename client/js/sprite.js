@@ -103,9 +103,7 @@ var ImageRenderable = me.Renderable.extend({
 		return false;
 	},
 	
-	draw : function(context) {
-		console.log("Image sprite drawing to the screen.");
-		
+	draw : function(context) {		
 		// If we have the width and the height, use them, otherwise
 		// allow the canvas to infer those values.
 		if (this.height != null && this.width != null) {
