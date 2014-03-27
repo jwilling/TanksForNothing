@@ -20,7 +20,10 @@ game.resources = [
 	{name: "Tutorial_Screen_3",  type:"image",	src: "data/img/Tutorial_Screen_3.png"},
 	{name: "Tutorial_Screen_4",  type:"image",	src: "data/img/Tutorial_Screen_4.png"},
 	{name: "playTestScreen",  type:"image",	src: "data/img/playTestScreen.png"},
-
+	
+	{ name: "title-background", type: "image", src: "data/img/sliced/title-background.png" },
+	{ name: "screen-grid-background", type: "image", src: "data/img/sliced/screen-grid-background.png" }
+	
 
 	/* 
 	 * Maps. 

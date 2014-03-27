@@ -8,7 +8,7 @@ game.TitleScreen = me.ScreenObject.extend({
 		
 		// Set up a new sprite for the background image and
 		// add it to the game object.
-		this.background = new ImageSprite("Start_Menu");
+		this.background = new ImageSprite("title-background");
 		me.game.world.addChild(this.background);
 		
 		// Set up an event listener to jump to the menu screen
