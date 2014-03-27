@@ -1,10 +1,6 @@
-game.TitleScreen = me.ScreenObject.extend({
+game.TitleScreen = CustomScreen.extend({
 	init : function() {
-		// Call the parent initializer using the following parameters:
-		//		addAsObject = true
-		//		persist = false;
-		this.parent(true, false);
-		this.z = 0;
+		this.parent();
 		
 		// Set up a new sprite for the background image and
 		// add it to the game object.
@@ -29,11 +25,5 @@ game.TitleScreen = me.ScreenObject.extend({
 	onDestroyEvent : function() {
 		// Remove the background image sprite.
 		me.game.world.removeChild(this.background);
-	},
-	
-	// Override the canvas drawing.
-	draw : function(context) {
-		// Clear the canvas.
-		me.video.clearSurface(context, "#000");
 	},
 });

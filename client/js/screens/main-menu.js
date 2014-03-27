@@ -1,9 +1,4 @@
-game.MainMenuScreen = me.ScreenObject.extend({
-	init : function() {
-		this.parent(true, false);
-		this.z = 0;				
-	},
-	
+game.MainMenuScreen = CustomScreen.extend({
 	// Called when this screen is set to be the current state.
 	//
 	// Buttons and images are set here to avoid interfering with
@@ -53,10 +48,5 @@ game.MainMenuScreen = me.ScreenObject.extend({
 		for (var sprite in this.sprites) {
 			me.game.world.removeChild(sprite);
 		}
-	},
-	
-	draw : function(context) {
-		// Clear the canvas.
-		me.video.clearSurface(context, "#000");
 	},
 });
