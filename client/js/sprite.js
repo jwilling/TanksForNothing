@@ -12,7 +12,7 @@ var ImageSprite = me.ObjectContainer.extend({
 	init : function(imageName, x, y, width, height) {
 		// Call the parent constructor.
 		this.parent();
-		
+
 		// Make sure the object doesn't depend on the screen.
 		this.isPersistent = true;
 		

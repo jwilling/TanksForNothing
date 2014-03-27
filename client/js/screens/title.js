@@ -12,15 +12,17 @@ game.TitleScreen = me.ScreenObject.extend({
 		me.game.world.addChild(this.background);
 		
 		// Set up an event listener to jump to the menu screen
-		// whenever a key is pressed.
-		var keyPressedHandler = function(event) {
+		// whenever a key is pressed or the mouse is clicked.
+		var finishHandler = function(event) {
 			// Change the state to the main menu.
 			me.state.change(STATE_MAIN_MENU);
-			window.removeEventListener('keydown', keyPressedHandler);
+			window.removeEventListener('keydown', finishHandler);
+			window.removeEventListener('click', finishHandler);
 		}
 		
-		// Add the event listener.
-		window.addEventListener('keydown', keyPressedHandler);
+		// Add the event listeners.
+		window.addEventListener('keydown', finishHandler);
+		window.addEventListener('click', finishHandler);
 	},
 	
 	// Called when the screen is about to be destroyed.
