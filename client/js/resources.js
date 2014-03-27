@@ -22,6 +22,7 @@ game.resources = [
     {name: "testTurret",  type:"image", src: "data/img/sprite/testTurret.png"},
     {name: "bulletTest",  type:"image", src: "data/img/sprite/bulletTest.png"},
 
+	{ name: "tank-body-red", type: "image", src: "data/img/sliced/tank-body-red.png" },
 
 	/* Atlases 
 	 * @example

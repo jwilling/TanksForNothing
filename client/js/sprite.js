@@ -20,6 +20,10 @@ var ImageSprite = me.ObjectContainer.extend({
 		// Call the parent constructor with the correct sizes.
 		this.parent(x, y, width, height);
 
+		// Store our x and y coordinates.
+		this.x = x;
+		this.y = y;
+
 		// Make sure the object doesn't depend on the screen.
 		this.isPersistent = true;
 				
@@ -31,8 +35,23 @@ var ImageSprite = me.ObjectContainer.extend({
 		this.z = zIndex || Infinity;
 
 		// Add the actual renderer as a child inside this container.
-		var renderer = new ImageRenderable(imageName, x, y, width, height, zIndex);
-		this.addChild(renderer);
+		this.renderer = new ImageRenderable(imageName, x, y, width, height, zIndex);
+		this.addChild(this.renderer);
+		
+		// Make an empty callback for when we change position.
+		this.positionChangedHandler = function(x, y) {};
+	},
+	
+	moveToPoint : function(x, y) {
+		var positionChanged = (this.x != x || this.y != y);
+		this.x = x;
+		this.y = y;
+		this.renderer.x = x;
+		this.renderer.y = y;
+
+		if (positionChanged) {
+			this.positionChangedHandler(x, y);
+		}
 	},
 });
 
