@@ -34,9 +34,36 @@ var ImageSprite = me.ObjectContainer.extend({
 	}
 });
 
+// An object that extends the sprite and has clickable capabilities.
+//
+// Behaves like the regular image sprite in all aspects, except it
+// allows for mouse events.
+//
+// Sample usage:
+//		var button = new ImageButton("image", 10, 10);
+//		button.clickHandler = function() { console.log("hi!") };
+//		me.game.world.addChild(button);
+//		
+// Be sure to remove the sprite when the screen is destroyed.
+var ImageButton = ImageSprite.extend({
+	init : function(imageName, x, y, width, height, zIndex) {
+		this.parent(imageName, x, y, width, height, zIndex)
+		
+		// Create an empty handler for the click event. This should
+		// be set later by the user.
+		this.clickHandler = function() {};
+		
+		me.input.registerPointerEvent('mousedown', this, this.clicked.bind(this));
+	}, 
+	
+	clicked : function(event) {
+		this.clickHandler();
+	}
+});
+
 // An internal renderable object that manipulates the canvas.
 //
-// Should not be used directly. Use ImageSprite instead.
+// Should not be used directly. Use ImageSprite or ImageButton instead.
 var ImageRenderable = me.Renderable.extend({
 	init : function(imageName, x, y, width, height) {		
 		// Initialize our position to be nothing, really.
