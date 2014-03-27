@@ -1,5 +1,6 @@
 var util = require("util");
 var io = require("socket.io");
+//var express = require("express");
 
 var socket;
 var players; //maps player ids to player;
@@ -115,6 +116,7 @@ Session.prototype.setState = function(state_name){
 
 var testSession = Session({});
 
+
 function init(){
 	socket = io.listen(50505);
 	socket.configure(function() {
@@ -156,12 +158,25 @@ var setEventHandlers = function() {
 		client.on("request_game_env", function(data){
 			onClientRequestGameEnv(client, data);
 		});
+		client.on("request_session", function(data){
+			onClientRequestSession(client, data);
+		});
 		client.on("request_playerID", function(data){
 			onClientRequestPlayerID(client, data);
+		});
+		client.on("update_player", function(data){
+			onClientUpdatePlayer(client, data);
 		});
 	});
 	//socket.sockets.on("disconnection", onSocketDisconnect);
 };
+
+function onClientUpdatePlayer(client, data){
+	var sessionID = data.sessionID;
+	var session = sessions[data.sessionID];
+	session.gameEnv.players[client.id] = data;
+	players[client.id] = data;
+}
 
 function updateGameEnvironmentsForSession(sessionID){
 	for(clientID in session.gameEnv.players){
@@ -176,8 +191,10 @@ function onClientStartGame(client, data){
 	var session = sessions[data.sessionID];
 	var player = session.gameEnv.players[client.id];
 	if(session.sessionOwner == client.id){
+		session.setState("inGame");
 		for(clientID in session.gameEnv.players){
 			socket.sockets.socket(clientID).emit("start_game", session.gameEnv);
+		}
 	}
 }
 
@@ -276,13 +293,21 @@ function onClientEndCharge(client, data){
 	
 }
 
-function onClientRequestID(client, data){
+function onClientRequestGameEnv(client, data){
+	console.log("Client requesting game");
+	var sessionID = data.sessionID;
+	var session = sessions[sessionID];
+	client.emit("update_game_env", session.gameEnv);
+}
+
+function onClientRequestPlayerID(client, data){
 	client.emit("update_playerID", {playerID: client.id});
 }
 
+function onClientRequestSession(client, data){
+	var player = players[client.id];
+	var session = sessions[player.sessionID];
+	client.emit("update_session", session);
+}
+
 init();
-
-
-
-
-
