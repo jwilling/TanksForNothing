@@ -30,9 +30,10 @@ game.PlayScreen = CustomScreen.extend({
 			this.tanks[playerID] = tank;
 			me.game.world.addChild(tank);
 		}
-		
+		console.log(gameEnv);
+		console.log(session);
 		// Store our tank.
-		this.tank = tanks[myPlayerID];
+		this.tank = this.tanks[myPlayerID];
 		this.tank.positionChangedHandler = function(x, y) {
 			// Forward this onto the client to hand on to the server.
 			updatePlayerLocationOnServer(x, y);
