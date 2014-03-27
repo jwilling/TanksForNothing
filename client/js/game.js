@@ -11,7 +11,7 @@ var game = {
 		// Set a callback to run when loading is complete.
 		me.loader.onload = this.loaded.bind(this);
 
-		// Load the resourcess.
+		// Load the resources.
 		me.loader.preload(game.resources);
 
 		// Initialize melonJS and display a loading screen.
@@ -20,12 +20,11 @@ var game = {
 
 	// Run on game resources loaded.
 	"loaded" : function () {
-		me.state.set(me.state.MENU, new game.TitleScreen());
-		// see here for more state: http://melonjs.github.io/docs/me.state.html
-		me.state.set(me.state.PLAY, new game.PlayScreen());
+		// Associate the states with the screens.
+		me.state.set(STATE_SPLASH_SCREEN, new game.TitleScreen());
+		me.state.set(STATE_MAIN_MENU, new game.MainMenuScreen());
 			
-		// Show the title screen.
-		me.state.change(me.state.MENU);
-		
+		// Show the splash screen.
+		me.state.change(STATE_SPLASH_SCREEN);
 	}
 };
