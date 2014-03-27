@@ -48,7 +48,7 @@ var ImageSprite = me.ObjectContainer.extend({
 		this.y = y;
 		this.renderer.x = x;
 		this.renderer.y = y;
-		
+
 		if (positionChanged) {
 			this.positionChangedHandler(x, y);
 		}

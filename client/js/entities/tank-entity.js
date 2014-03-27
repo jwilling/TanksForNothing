@@ -14,7 +14,7 @@ var PhysicalSprite = ImageSprite.extend({
 		this.accelerationX = 0;
 		this.accelerationY = 0;
 		
-		this.collidable = true;
+		this.collidable = false;
 	},
 	
 	update : function() {
@@ -55,14 +55,9 @@ var PhysicalSprite = ImageSprite.extend({
 		this.currentVelocityX = newVelocityX;
 		this.currentVelocityY = newVelocityY;
 		
-		this.moveToPoint(newPositionX, newPositionY);
-	},
-	
-	draw : function(context) {
-		this.parent(context);
-		
-		context.fillStyle = "rgba(0, 0, 200, 0.2)";
-		context.fillRect(this.x, this.y, this.width, this.height);
+		if (newPositionX != this.x || newPositionY != this.y) {
+			this.moveToPoint(newPositionX, newPositionY);
+		}
 	},
 	
 	// Acceleration is a number from 0 - 1.

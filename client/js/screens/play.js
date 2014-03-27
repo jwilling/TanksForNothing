@@ -2,7 +2,7 @@ game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 		
 		//load level
-		me.levelDirector.loadLevel("area01");
+		me.levelDirector.loadLevel("bloodGultch");
 		
 		// reset the score
 		game.data.score = 0;
@@ -30,6 +30,8 @@ game.PlayScreen = CustomScreen.extend({
 		if (me.input.isKeyPressed('down')) {
 			this.tank.setAccelerationY(1);
 		}
+		
+		return true;
 	},
 
 	onDestroyEvent: function() {
