@@ -35,5 +35,5 @@ game.TitleScreen = me.ScreenObject.extend({
 	draw : function(context) {
 		// Clear the canvas.
 		me.video.clearSurface(context, "#000");
-	 },
+	},
 });
