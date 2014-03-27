@@ -6,6 +6,11 @@ var playerID;
 var session;
 var gameEnv;
 
+//Update Server Game Env
+function updatePlayerOnServer(){
+	socket.emit("update_player", gameEnv.players[playerID]);
+}
+
 //Player Object Constructor
 function Player(playerID){
 	this.playerID = playerID;
@@ -52,7 +57,7 @@ function Session(sessionOwner, settings){
 	this.state = sessionStates["acceptingPlayers"];
 }
 
-function init(){
+function initSocket(){
 	socket = io.listen(50505);
 	socket.configure(function() {
 		socket.set("transports", ["websocket"]);
@@ -93,3 +98,5 @@ function onServerUpdatePlayerID(client, data){
 function onServerUpdateGameSession(client, data){
 	session = data;	
 }
+
+initSocket();

@@ -156,6 +156,9 @@ var setEventHandlers = function() {
 		client.on("request_game_env", function(data){
 			onClientRequestGameEnv(client, data);
 		});
+		client.on("request_session"), function(data){
+			onClientRequestSession(client, data);
+		}
 		client.on("request_playerID", function(data){
 			onClientRequestPlayerID(client, data);
 		});
@@ -169,6 +172,15 @@ function updateGameEnvironmentsForSession(sessionID){
 	}
 }
 
+var something = {"1":1, "2":2, "3":3};
+
+for(key in something){
+	var player = something[key];
+	if(player.playerID != playerID){
+		//then update positions	
+	}	
+}
+
 
 function onClientStartGame(client, data){
 	console.log("Client Starting Game");
@@ -176,6 +188,7 @@ function onClientStartGame(client, data){
 	var session = sessions[data.sessionID];
 	var player = session.gameEnv.players[client.id];
 	if(session.sessionOwner == client.id){
+		session.setState("inGame");
 		for(clientID in session.gameEnv.players){
 			socket.sockets.socket(clientID).emit("start_game", session.gameEnv);
 	}
@@ -276,8 +289,21 @@ function onClientEndCharge(client, data){
 	
 }
 
+function onClientRequestGameEnv(client, data){
+	console.log("Client requesting game");
+	var sessionID = data.sessionID;
+	var session = sessions[sessionID];
+	client.emit("update_game_env", session.gameEnv)
+}
+
 function onClientRequestID(client, data){
 	client.emit("update_playerID", {playerID: client.id});
+}
+
+function onClientRequestSession(client, data){
+	var player = players[client.id];
+	var session = sessions[player.sessionID];
+	client.emit("update_session", session);
 }
 
 init();
