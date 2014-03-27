@@ -3,7 +3,7 @@
 // ***********************
 
 // The splash screen, displayed when the game first loads.
-var STATE_SPLASH_SCREEN = me.state.USER + 0;
+var STATE_SPLASH = me.state.USER + 0;
 
 // The main menu.
 var STATE_MAIN_MENU = me.state.USER + 1;

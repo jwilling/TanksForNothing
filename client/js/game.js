@@ -21,10 +21,10 @@ var game = {
 	// Run on game resources loaded.
 	"loaded" : function () {
 		// Associate the states with the screens.
-		me.state.set(STATE_SPLASH_SCREEN, new game.TitleScreen());
+		me.state.set(STATE_SPLASH, new game.TitleScreen());
 		me.state.set(STATE_MAIN_MENU, new game.MainMenuScreen());
 			
 		// Show the splash screen.
-		me.state.change(STATE_SPLASH_SCREEN);
+		me.state.change(STATE_SPLASH);
 	}
 };
