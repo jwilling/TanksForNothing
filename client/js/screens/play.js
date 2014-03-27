@@ -1,7 +1,4 @@
 game.PlayScreen = CustomScreen.extend({
-	/**
-	 *  action to perform on state change
-	 */
 	onResetEvent: function() {
 		
 		//load level
@@ -9,14 +6,33 @@ game.PlayScreen = CustomScreen.extend({
 		
 		// reset the score
 		game.data.score = 0;
+		
+		this.tank = new TankSprite(30, 30);
+		this.tank.positionChangedHandler = function(x, y) {
+			console.log("moved: " + x + ", " + y);
+		}
+		me.game.world.addChild(this.tank);
+	},
+	
+	update : function() {
+		this.tank.setAccelerationX(0);
+		this.tank.setAccelerationY(0);
+			
+		if (me.input.isKeyPressed('left')) {
+			this.tank.setAccelerationX(-1);
+		}
+		if (me.input.isKeyPressed('right')) {
+			this.tank.setAccelerationX(1);
+		}
+		if (me.input.isKeyPressed('up')) {
+			this.tank.setAccelerationY(-1);
+		}
+		if (me.input.isKeyPressed('down')) {
+			this.tank.setAccelerationY(1);
+		}
 	},
 
-
-	/**
-	 *  action to perform when leaving this screen (state change)
-	 */
 	onDestroyEvent: function() {
-		// remove the HUD from the game world
-		me.game.world.removeChild(this.HUD);
+		
 	}
 });
