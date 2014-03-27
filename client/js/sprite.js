@@ -78,6 +78,12 @@ var ImageButton = ImageSprite.extend({
 		me.input.registerPointerEvent('mousedown', this, this.clicked.bind(this));
 	},
 	
+	destroy : function() {
+		this.parent();
+		
+		me.input.releasePointerEvent('mousedown', this);
+	},
+	
 	clicked : function(event) {
 		this.clickHandler();
 	}
