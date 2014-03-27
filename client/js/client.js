@@ -3,8 +3,10 @@
 
 var socket;
 var myPlayerID;
-var session;
+var session = null;
 var gameEnv;
+
+var gameEnvUpdateCallBack = null;
 
 //Update Server Game Env
 function updatePlayerOnServer(){
@@ -19,7 +21,9 @@ function updatePlayerLocationOnServer(locX, locY){
 	socket.emit("move_body", { "locX": locX, "locY": locY });
 }
 
-
+function joinGame(){
+	socket.emit("join_game", {});
+}
 
 //Player Object Constructor
 function Player(playerID){
@@ -90,6 +94,7 @@ var setEventHandlers = function() {
 			onServerUpdateGameEnv(client, data);
 		});	
 		client.emit("request_playerID",{});
+		client.emit("join_game", {});
 		//client.on("player_left_game", function(data){
 		//	onServerUpdateGameEnv(client, data);
 		//});
@@ -99,6 +104,7 @@ var setEventHandlers = function() {
 
 function onServerUpdateGameEnv(client, data){
 	gameEnv = data;
+	gameEnvUpdateCallback(gameEnv);
 }
 
 function onServerUpdatePlayerID(client, data){
@@ -110,5 +116,11 @@ function onServerUpdatePlayerID(client, data){
 function onServerUpdateGameSession(client, data){
 	session = data;	
 }
+
+window.setInterval(50, function(){
+	if(GameIsInSession){ //client/js/play.js
+		requestGameEnv();
+	}
+});
 
 initSocket();
