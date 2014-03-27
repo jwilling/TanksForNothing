@@ -10,8 +10,13 @@ var ImageSprite = me.ObjectContainer.extend({
 	//
 	// Note that the width, height, and zIndex are optional.
 	init : function(imageName, x, y, width, height, zIndex) {
-		// Call the parent constructor.
-		this.parent();
+		// Call the parent constructor with the correct sizes.
+		if (width != null && height != null) {
+			this.parent(x, y, width, height);
+		} else {
+			var image = me.loader.getImage(imageName);
+			this.parent(x, y, image.width, image.height);
+		}
 
 		// Make sure the object doesn't depend on the screen.
 		this.isPersistent = true;
