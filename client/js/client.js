@@ -1,15 +1,25 @@
 //var util = require("util");
-var io = require("socket.io");
+//var io = require("socket.io");
 
 var socket;
-var playerID;
+var myPlayerID;
 var session;
 var gameEnv;
 
 //Update Server Game Env
 function updatePlayerOnServer(){
-	socket.emit("update_player", gameEnv.players[playerID]);
+	socket.emit("update_player", gameEnv.players[myPlayerID]);
 }
+
+function requestGameEnv(){
+	socket.emit("request_game_env", {});
+}
+
+function updatePlayerLocationOnServer(locX, locY){
+	socket.emit("move_body", { "locX": locX, "locY": locY });
+}
+
+
 
 //Player Object Constructor
 function Player(playerID){
@@ -57,17 +67,16 @@ function Session(sessionOwner, settings){
 	this.state = sessionStates["acceptingPlayers"];
 }
 
+var client = null;
+
 function initSocket(){
-	socket = io.listen(50505);
-	socket.configure(function() {
-		socket.set("transports", ["websocket"]);
-		socket.set("log level", 1);
-	});
+	socket = io.connect("127.0.0.1:50505");
+	client = socket;
 	setEventHandlers();
 }
 
 var setEventHandlers = function() { 
-	socket.sockets.on("connection", function(client){
+	//socket.on("connection", function(client){
 		client.on("update_game_env", function(data){
 			onServerUpdateGameEnv(client, data);
 		});	
@@ -80,10 +89,11 @@ var setEventHandlers = function() {
 		client.on("playerDeath", function(data){
 			onServerUpdateGameEnv(client, data);
 		});	
+		client.emit("request_playerID",{});
 		//client.on("player_left_game", function(data){
 		//	onServerUpdateGameEnv(client, data);
 		//});
-	});
+	//});
 	//socket.sockets.on("disconnection", onSocketDisconnect);
 };
 
@@ -92,7 +102,9 @@ function onServerUpdateGameEnv(client, data){
 }
 
 function onServerUpdatePlayerID(client, data){
-	playerID = data.playerID;
+	console.log("Setting Player ID");
+	myPlayerID = data.playerID;
+	console.log("myPlayerID="+myPlayerID);
 }
 
 function onServerUpdateGameSession(client, data){
