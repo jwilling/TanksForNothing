@@ -10,28 +10,30 @@ var ImageSprite = me.ObjectContainer.extend({
 	//
 	// Note that the width, height, and zIndex are optional.
 	init : function(imageName, x, y, width, height, zIndex) {
-		// Call the parent constructor with the correct sizes.
-		if (width != null && height != null) {
-			this.parent(x, y, width, height);
-		} else {
+		// Make sure we have a width and a height.
+		if (!width || !height) {
 			var image = me.loader.getImage(imageName);
-			this.parent(x, y, image.width, image.height);
+			width = image.width;
+			height = image.height;
 		}
+		
+		// Call the parent constructor with the correct sizes.
+		this.parent(x, y, width, height);
 
 		// Make sure the object doesn't depend on the screen.
 		this.isPersistent = true;
-		
+				
 		// By default it shouldn't be collidable.
 		this.collidable = false;
 		
 		// If the z-index wasn't provided, make sure we're 
 		// on top of the world.
 		this.z = zIndex || Infinity;
-		
+
 		// Add the actual renderer as a child inside this container.
 		var renderer = new ImageRenderable(imageName, x, y, width, height, zIndex);
 		this.addChild(renderer);
-	}
+	},
 });
 
 // An object that extends the sprite and has clickable capabilities.
@@ -48,13 +50,14 @@ var ImageSprite = me.ObjectContainer.extend({
 var ImageButton = ImageSprite.extend({
 	init : function(imageName, x, y, width, height, zIndex) {
 		this.parent(imageName, x, y, width, height, zIndex)
-		
+
 		// Create an empty handler for the click event. This should
 		// be set later by the user.
 		this.clickHandler = function() {};
 		
+		// Register for receiving pointer events.
 		me.input.registerPointerEvent('mousedown', this, this.clicked.bind(this));
-	}, 
+	},
 	
 	clicked : function(event) {
 		this.clickHandler();
@@ -107,7 +110,7 @@ var ImageRenderable = me.Renderable.extend({
 		// If we have the width and the height, use them, otherwise
 		// allow the canvas to infer those values.
 		if (this.height != null && this.width != null) {
-			context.drawImage(this.image, this.x, this.y, width, height);
+			context.drawImage(this.image, this.x, this.y, this.width, this.height);
 		} else {
 			context.drawImage(this.image, this.x, this.y);
 		}
