@@ -3,22 +3,17 @@ var GameIsInSession = false;
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 		GameIsInSession = true;
-		console.log("hey");
-		//load level
+
+		// Load the level.
 		me.levelDirector.loadLevel("bloodGultch");
 		
-		// reset the score
+		// Reset the score.
 		game.data.score = 0;
 		
 		// Create the tanks.
 		this.createTanks();
 		
-		this.tank = new TankSprite(30, 30);
-		this.tank.positionChangedHandler = function(x, y) {
-			//console.log("moved: " + x + ", " + y);
-		}
-		me.game.world.addChild(this.tank);
-		
+		// Set up a callback for when the environment is updated.
 		gameEnvUpdateCallback = updateEnvironment;
 	},
 	
@@ -38,6 +33,10 @@ game.PlayScreen = CustomScreen.extend({
 		
 		// Store our tank.
 		this.tank = tanks[myPlayerID];
+		this.tank.positionChangedHandler = function(x, y) {
+			// Forward this onto the client to hand on to the server.
+			updatePlayerLocationOnServer(x, y);
+		}
 	},
 	
 	updateEnvironment : function(gameEnv) {
