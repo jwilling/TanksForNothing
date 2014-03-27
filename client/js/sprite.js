@@ -8,8 +8,8 @@
 var ImageSprite = me.ObjectContainer.extend({
 	// The initializer.
 	//
-	// Note that the width and the height are optional.
-	init : function(imageName, x, y, width, height) {
+	// Note that the width, height, and zIndex are optional.
+	init : function(imageName, x, y, width, height, zIndex) {
 		// Call the parent constructor.
 		this.parent();
 
@@ -19,11 +19,13 @@ var ImageSprite = me.ObjectContainer.extend({
 		// By default it shouldn't be collidable.
 		this.collidable = false;
 		
-		// Make sure we're on top of the world.
-		this.z = Infinity;
+		// If the z-index wasn't provided, make sure we're 
+		// on top of the world.
+		this.z = zIndex || Infinity;
 		
 		// Add the actual renderer as a child inside this container.
-		this.addChild(new ImageRenderable(imageName, x, y, width, height));
+		var renderer = new ImageRenderable(imageName, x, y, width, height, zIndex);
+		this.addChild(renderer);
 	}
 });
 
@@ -31,13 +33,13 @@ var ImageSprite = me.ObjectContainer.extend({
 //
 // Should not be used directly. Use ImageSprite instead.
 var ImageRenderable = me.Renderable.extend({
-	init : function(imageName, x, y, width, height) {
+	init : function(imageName, x, y, width, height) {		
 		// Initialize our position to be nothing, really.
 		//
 		// Since the drawing will be done through the canvas
 		// the size and position doesn't even matter.
 		this.parent(new me.Vector2d(0, 0), 0, 0);
-		
+				
 		// Turn on floating, which means we will use canvas coordinates.
 		//
 		// Without this, we won't get rendered because lolmelon.
@@ -47,8 +49,8 @@ var ImageRenderable = me.Renderable.extend({
 		this.needsUpdate = true;
 		
 		// Save the coordinates for later.
-		this.x = x;
-		this.y = y;
+		this.x = x || 0;
+		this.y = y || 0;
 		
 		// Save the width and the height, which might or might not be
 		// supplied. If they are given, we use them, otherwise we
@@ -57,7 +59,7 @@ var ImageRenderable = me.Renderable.extend({
 		this.height = height;
 		
 		// Load the image for later drawing.
-		this.image = me.loader.getImage("Start_Menu");
+		this.image = me.loader.getImage(imageName);
 	},
 	
 	update : function() {
@@ -75,9 +77,9 @@ var ImageRenderable = me.Renderable.extend({
 		// If we have the width and the height, use them, otherwise
 		// allow the canvas to infer those values.
 		if (this.height != null && this.width != null) {
-			context.drawImage(this.image, 0, 0, width, height);
+			context.drawImage(this.image, this.x, this.y, width, height);
 		} else {
-			context.drawImage(this.image, 0, 0);
+			context.drawImage(this.image, this.x, this.y);
 		}
 	}
 });
