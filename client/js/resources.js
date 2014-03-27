@@ -1,37 +1,36 @@
 game.resources = [
-	/**
-	 * Graphics.
+
+	/* Graphics. 
+	 * @example
+	 * {name: "example", type:"image", src: "data/img/example.png"},
 	 */
-	// our level tileset
-	{name: "openTestScreen",  type:"image",	src: "data/img/openTestScreen.png"},
-	{name: "button",  type:"image",	src: "data/img/button.png"},
-	{name: "Countdown",  type:"image",	src: "data/img/Countdown.png"},
-	{name: "Game",  type:"image",	src: "data/img/Game.png"},
-	{name: "Match_Making",  type:"image",	src: "data/img/Match_Making.png"},
-	{name: "Menu",  type:"image",	src: "data/img/Menu.png"},
-	{name: "Options",  type:"image",	src: "data/img/Options.png"},
-	{name: "Score_Screen",  type:"image",	src: "data/img/Score_Screen.png"},
-	{name: "Staging1_Host",  type:"image",	src: "data/img/Staging1_(Host).png"},
-	{name: "Staging2_Host",  type:"image",	src: "data/img/Staging2_(Host).png"},
-	{name: "Staging2_Player",  type:"image",	src: "data/img/Staging2_(Player).png"},
-	{name: "Start_Menu",  type:"image",	src: "data/img/Start_Menu.png"},
-	{name: "Tutorial_Screen_1",  type:"image",	src: "data/img/Tutorial_Screen_1.png"},
-	{name: "Tutorial_Screen_2",  type:"image",	src: "data/img/Tutorial_Screen_2.png"},
-	{name: "Tutorial_Screen_3",  type:"image",	src: "data/img/Tutorial_Screen_3.png"},
-	{name: "Tutorial_Screen_4",  type:"image",	src: "data/img/Tutorial_Screen_4.png"},
-	{name: "playTestScreen",  type:"image",	src: "data/img/playTestScreen.png"},
+	{name: "area01_level_tiles", type:"image", src: "data/img/map/area01_level_tiles.png"},
+	{name: "gripe_run_right", type:"image", src: "data/img/sprite/gripe_run_right.png"},
+    {name: "spinning_coin_gold",  type:"image", src: "data/img/sprite/spinning_coin_gold.png"},
+    {name: "testTank",  type:"image", src: "data/img/sprite/testTank.png"},
+    {name: "testTankBig",  type:"image", src: "data/img/sprite/testTankBig.png"},
+    {name: "testTurret",  type:"image", src: "data/img/sprite/testTurret.png"},
+    {name: "bulletTest",  type:"image", src: "data/img/sprite/bulletTest.png"},
 
 
-	/* 
-	 * Maps. 
+	/* Atlases 
+	 * @example
+	 * {name: "example_tps", type: "tps", src: "data/img/example_tps.json"},
+	 */
+		
+	/* Maps. 
+	 * @example
+	 * {name: "example01", type: "tmx", src: "data/map/example01.tmx"},
+	 * {name: "example01", type: "tmx", src: "data/map/example01.json"},
  	 */
-	//{name: "area01",              type: "tmx",	src: "data/map/area01.tmx"}
-
-	/* 
-	 * Background music. 
+	{name: "area01", type: "tmx", src: "data/map/area01.tmx"}
+	/* Background music. 
+	 * @example
+	 * {name: "example_bgm", type: "audio", src: "data/bgm/", channel : 1},
 	 */	
 
-	/* 
-	 * Sound effects. 
+	/* Sound effects. 
+	 * @example
+	 * {name: "example_sfx", type: "audio", src: "data/sfx/", channel : 2}
 	 */
 ];
