@@ -46,7 +46,7 @@ game.MainMenuScreen = CustomScreen.extend({
 	onDestroyEvent : function() {
 		// Get rid of all of the sprites / buttons we added.
 		for (var i = 0; i < this.sprites.length; i++) {
-			me.game.world.removeChild(this.sprites[i]);
+			me.game.world.removeChild(this.sprites[i], false);
 		}
 	},
 });
