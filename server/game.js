@@ -41,15 +41,16 @@ function Player(playerID){
 	this.sessionID = 0;
 };
 
-function Shot(direction, startChargeTime, endChargeTime){
-	this.locX = players.playerID.locX;
-	this.locY = players.playerID.locY;
+function Shot(playerID, direction, chargeLength){
+	this.locX = players[playerID].locX;
+	this.locY = players[playerID].locY;
 	this.playerID = playerID;
 	//TODO set damage using charge length;
 	this.damage = 10;
 	this.direction = direction;
-	this.chargeLength = startChargeTime - endChargeTime;
+	this.chargeLength = chargeLength;
 };
+
 
 function GameEnv(sessionID){
 	this.players = {};
@@ -80,8 +81,8 @@ GameEnv.prototype.rotateTurret = function(playerID, newDegreeDirection){
 	this.players[playerID].turretDirection = rads;
 };
 
-GameEnv.prototype.shoot = function(playerID, directionInDegrees){
-	var shot = new Shot(playerID, 10, directionInDegrees);
+GameEnv.prototype.shoot = function(playerID, directionInDegrees, chargeLength){
+	var shot = new Shot(playerID, direction, chargeLength);
 	this.shots.push(shot);
 };
 GameEnv.prototype.addShot = function(shot){
@@ -115,7 +116,6 @@ Session.prototype.setState = function(state_name){
 var testSession = Session({});
 
 function init(){
-	players = [];
 	socket = io.listen(50505);
 	socket.configure(function() {
 		socket.set("transports", ["websocket"]);
@@ -271,7 +271,7 @@ function onClientEndCharge(client, data){
 	var sessionID = data.sessionID;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
-	var shot = new Shot(data.direction, player.chargeShotStart, new Date().getTime());
+	var shot = new Shot(data.direction, (player.chargeShotStart - new Date().getTime()));
 	session.gameEnv.addShot(shot);
 	
 }
