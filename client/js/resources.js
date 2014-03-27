@@ -22,7 +22,14 @@ game.resources = [
 	{name: "playTestScreen",  type:"image",	src: "data/img/playTestScreen.png"},
 	
 	{ name: "title-background", type: "image", src: "data/img/sliced/title-background.png" },
-	{ name: "screen-grid-background", type: "image", src: "data/img/sliced/screen-grid-background.png" }
+	{ name: "background", type: "image", src: "data/img/sliced/background.png" },
+	
+	// Main menu buttons.
+	{ name: "menu-button-credits", type: "image", src: "data/img/sliced/menu-button-credits.png" },
+	{ name: "menu-button-new-game", type: "image", src: "data/img/sliced/menu-button-new-game.png" },
+	{ name: "menu-button-options", type: "image", src: "data/img/sliced/menu-button-options.png" },
+	{ name: "menu-button-tutorial", type: "image", src: "data/img/sliced/menu-button-tutorial.png" },
+	
 	
 
 	/* 
