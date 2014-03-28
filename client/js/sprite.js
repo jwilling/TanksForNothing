@@ -1,3 +1,9 @@
+// A generic point object.
+function Point(x, y) {
+	this.x = x;
+	this.y = y;
+}
+
 // An object that draws the image to the screen, acting like a sprite.
 //
 // Sample usage:
@@ -37,7 +43,27 @@ var ImageSprite = me.ObjectContainer.extend({
 		// Make an empty callback for when we change position.
 		this.positionChangedHandler = function(x, y) {};
 		
-		// Perform an initial draw.
+		// Default our anchor point to the center of the object.
+		this.anchorPoint = new Point(0.5, 0.5);
+		
+		// Make our default rotation 0.
+		this.rotation = 0;
+		
+		// Perform an initial draw on the next game update.
+		this.dirty = true;
+	},
+	
+	// Sets a new anchor point and redraws the sprite.
+	setAnchorPoint : function(x, y) {
+		this.anchorPoint = new Point(x, y);
+		this.dirty = true;
+	},
+	
+	// Sets a new rotation and redraws the sprite.
+	//
+	// Rotation is expressed in degrees.
+	setRotation : function(rotation) {
+		this.rotation = rotation;
 		this.dirty = true;
 	},
 	
@@ -66,11 +92,37 @@ var ImageSprite = me.ObjectContainer.extend({
 	},
 	
 	draw : function(context) {
-		if (this.height != null && this.width != null) {
-			context.drawImage(this.image, this.x, this.y, this.width, this.height);
-		} else {
-			context.drawImage(this.image, this.x, this.y);
-		}
+		// Save the context so we won't mess up other drawing
+		// operations that share the same context.
+		context.save();
+		
+		// Calculate the offset from the origin of the sprite
+		// that we should rotate the sprite around.
+		var offsetX = this.width * this.anchorPoint.x;
+		var offsetY = this.height * this.anchorPoint.y;
+		
+		// Get the rotation of the object in radians.
+		var rotation = (this.rotation * Math.PI) / 180;
+		
+		// Translate the context to be at the origin of our sprite.
+		//
+		// We then translate it further to be at the anchor point
+		// relative to the position of our sprite.
+		context.translate(this.x + offsetX, this.y + offsetY);
+
+		// Rotate the context around the anchor point.
+		context.rotate(rotation);
+		
+		// Translate the context back to its original position.
+		context.translate(-(this.x + offsetX), -(this.y + offsetY));
+		
+		//context.webkitImageSmoothingEnabled = true;
+		
+		// Finally draw the sprite image into this modified context.
+		context.drawImage(this.image, this.x, this.y, this.width, this.height);
+		
+		// Restore the original state of the context.
+		context.restore();
 	}
 });
 
