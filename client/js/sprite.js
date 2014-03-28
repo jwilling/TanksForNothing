@@ -10,19 +10,19 @@ var ImageSprite = me.ObjectContainer.extend({
 	//
 	// Note that the width, height, and zIndex are optional.
 	init : function(imageName, x, y, width, height, zIndex) {
-		// Make sure we have a width and a height.
-		if (!width || !height) {
-			var image = me.loader.getImage(imageName);
-			width = image.width;
-			height = image.height;
-		}
+		// Load and store the image.
+		this.image = me.loader.getImage(imageName);
+		
+		// Store the width and the height.
+		width = width || this.image.width;
+		height = height || this.image.height;
+		
+		// Store our x and y coordinates.
+		this.x = x || 0;
+		this.y = y || 0;
 		
 		// Call the parent constructor with the correct sizes.
 		this.parent(x, y, width, height);
-
-		// Store our x and y coordinates.
-		this.x = x;
-		this.y = y;
 
 		// Make sure the object doesn't depend on the screen.
 		this.isPersistent = true;
@@ -34,25 +34,44 @@ var ImageSprite = me.ObjectContainer.extend({
 		// on top of the world.
 		this.z = zIndex || Infinity;
 
-		// Add the actual renderer as a child inside this container.
-		this.renderer = new ImageRenderable(imageName, x, y, width, height, zIndex);
-		this.addChild(this.renderer);
-		
 		// Make an empty callback for when we change position.
 		this.positionChangedHandler = function(x, y) {};
+		
+		// Perform an initial draw.
+		this.dirty = true;
+	},
+	
+	update : function() {
+		// Only draw an update to the screen if our internal state
+		// has changed.
+		if (this.dirty) {
+			this.dirty = false;
+			return true;
+		}
+		
+		return false;
 	},
 	
 	moveToPoint : function(x, y) {
 		var positionChanged = (this.x != x || this.y != y);
 		this.x = x;
 		this.y = y;
-		this.renderer.x = x;
-		this.renderer.y = y;
 
+		// Only trigger a drawing update if the position has actually
+		// changed since the last redraw for performance reasons.
 		if (positionChanged) {
+			this.dirty = true;
 			this.positionChangedHandler(x, y);
 		}
 	},
+	
+	draw : function(context) {
+		if (this.height != null && this.width != null) {
+			context.drawImage(this.image, this.x, this.y, this.width, this.height);
+		} else {
+			context.drawImage(this.image, this.x, this.y);
+		}
+	}
 });
 
 // An object that extends the sprite and has clickable capabilities.
@@ -81,63 +100,12 @@ var ImageButton = ImageSprite.extend({
 	destroy : function() {
 		this.parent();
 		
+		// Remove the handler for the rect.
 		me.input.releasePointerEvent('mousedown', this);
 	},
 	
 	clicked : function(event) {
+		// Forward the click onto the user-set handler.
 		this.clickHandler();
-	}
-});
-
-// An internal renderable object that manipulates the canvas.
-//
-// Should not be used directly. Use ImageSprite or ImageButton instead.
-var ImageRenderable = me.Renderable.extend({
-	init : function(imageName, x, y, width, height) {		
-		// Initialize our position to be nothing, really.
-		//
-		// Since the drawing will be done through the canvas
-		// the size and position doesn't even matter.
-		this.parent(new me.Vector2d(0, 0), 0, 0);
-				
-		// Turn on floating, which means we will use canvas coordinates.
-		//
-		// Without this, we won't get rendered because lolmelon.
-		this.floating = true;
-		
-		// Flag ourself as "dirty" so that we'll get a screen update.
-		this.needsUpdate = true;
-		
-		// Save the coordinates for later.
-		this.x = x || 0;
-		this.y = y || 0;
-		
-		// Save the width and the height, which might or might not be
-		// supplied. If they are given, we use them, otherwise we
-		// let the canvas decide how big the image is.
-		this.width = width;
-		this.height = height;
-		
-		// Load the image for later drawing.
-		this.image = me.loader.getImage(imageName);
-	},
-	
-	update : function() {
-		if (this.needsUpdate) {
-			this.needsUpdate = false;
-			return true;
-		}
-		
-		return false;
-	},
-	
-	draw : function(context) {		
-		// If we have the width and the height, use them, otherwise
-		// allow the canvas to infer those values.
-		if (this.height != null && this.width != null) {
-			context.drawImage(this.image, this.x, this.y, this.width, this.height);
-		} else {
-			context.drawImage(this.image, this.x, this.y);
-		}
 	}
 });
