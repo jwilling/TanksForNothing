@@ -72,6 +72,53 @@ var PhysicalSprite = ImageSprite.extend({
 
 var TankSprite = PhysicalSprite.extend({
 	init : function(x, y) {
-		this.parent("tank-body-red", x, y, 2);
+		this.parent("tank-body-red", x, y, 3);
+		this.movingRight = false;
+		this.movingLeft = false;
+		this.movingUp = false;
+		this.movingDown = false;
+	},
+	
+	setMovingRight : function(moving) {
+		this.movingRight = moving;
+		this.updateState();
+	},
+	
+	setMovingLeft : function(moving) {
+		this.movingLeft = moving;
+		this.updateState();
+	},
+	
+	setMovingUp : function(moving) {
+		this.movingUp = moving;
+		this.updateState();
+	},
+	
+	setMovingDown : function(moving) {
+		this.movingDown = moving;
+		this.updateState();
+	},
+	
+	updateState : function() {
+		this.setAccelerationX(this.movingRight ? 1 : (this.movingLeft ? -1 : 0));
+		this.setAccelerationY(this.movingDown ? 1 : (this.movingUp ? -1 : 0));
+		
+		this.updateRotation();
+	},
+	
+	updateRotation : function() {		
+		if (this.movingUp && this.movingRight || this.movingDown && this.movingLeft) {
+			this.setRotation(-45);
+		} else if (this.movingUp && this.movingLeft || this.movingDown && this.movingRight) {
+			this.setRotation(45);
+		} else if (this.movingUp || this.movingDown) {
+			this.setRotation(90);
+		} else if (this.movingRight || this.movingLeft) {
+			this.setRotation(0);
+		}
+	},
+	
+	update : function() {
+		return this.parent();
 	}
 });
