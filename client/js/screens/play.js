@@ -62,21 +62,12 @@ game.PlayScreen = CustomScreen.extend({
 	},
 	
 	update : function() {
-		this.tank.setAccelerationX(0);
-		this.tank.setAccelerationY(0);
-			
-		if (me.input.isKeyPressed('left')) {
-			this.tank.setAccelerationX(-1);
-		}
-		if (me.input.isKeyPressed('right')) {
-			this.tank.setAccelerationX(1);
-		}
-		if (me.input.isKeyPressed('up')) {
-			this.tank.setAccelerationY(-1);
-		}
-		if (me.input.isKeyPressed('down')) {
-			this.tank.setAccelerationY(1);
-		}
+		// Set the appropriate movement on the tank by interpreting
+		// the currently-pressed keys.
+		this.tank.setMovingRight(me.input.isKeyPressed('right'));
+		this.tank.setMovingLeft(me.input.isKeyPressed('left'));
+		this.tank.setMovingDown(me.input.isKeyPressed('down'));
+		this.tank.setMovingUp(me.input.isKeyPressed('up'));
 		
 		// We don't want to cause a full redraw, so return false.
 		//
