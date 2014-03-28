@@ -14,25 +14,35 @@ game.PlayScreen = CustomScreen.extend({
 		this.createTanks();
 		
 		// Set up a callback for when the environment is updated.
-		gameEnvUpdateCallback = updateEnvironment;
+		// TODO: re-enable once server starts working.
+		//gameEnvUpdateCallback = updateEnvironment;
 	},
 	
 	createTanks : function() {
+		// TODO: TEMPORARY. Put in place until the server works.
+		gameEnv = {
+			players : [ new Player("player1"), new Player("player2") ]
+		}
+		myPlayerID = "player1";
+		
+		
 		this.tanks = {};
 		
 		// Iterate over the players in the game environment (client.js).
-		for (var playerID in gameEnv.players) {
-			var player = gameEnv.players[playerID];
+		for (var key in gameEnv.players) {
+			if (!gameEnv.players.hasOwnProperty(key)) continue;
+			
+			var player = gameEnv.players[key];
 			
 			// Create a new tank, associate it with the player, and
 			// add it to the world.
 			var tank = new TankSprite(player.locX, player.locY);
-			this.tanks[playerID] = tank;
+			this.tanks[player.playerID] = tank;
 			me.game.world.addChild(tank);
 		}
 		
 		// Store our tank.
-		this.tank = tanks[myPlayerID];
+		this.tank = this.tanks[myPlayerID];
 		this.tank.positionChangedHandler = function(x, y) {
 			// Forward this onto the client to hand on to the server.
 			updatePlayerLocationOnServer(x, y);
@@ -68,7 +78,11 @@ game.PlayScreen = CustomScreen.extend({
 			this.tank.setAccelerationY(1);
 		}
 		
-		return true;
+		// We don't want to cause a full redraw, so return false.
+		//
+		// The sprites will trigger their own drawing updates if
+		// they need them.
+		return false;
 	},
 
 	onDestroyEvent: function() {
