@@ -18,8 +18,6 @@ var PhysicalSprite = ImageSprite.extend({
 	},
 	
 	update : function() {
-		this.parent();
-		
 		var timestep = me.timer.tick;
 				
 		// Calculate the velocity for the entity. Also cap the
@@ -58,6 +56,8 @@ var PhysicalSprite = ImageSprite.extend({
 		if (newPositionX != this.x || newPositionY != this.y) {
 			this.moveToPoint(newPositionX, newPositionY);
 		}
+		
+		return this.parent();
 	},
 	
 	// Acceleration is a number from 0 - 1.
