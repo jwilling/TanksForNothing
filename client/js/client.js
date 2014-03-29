@@ -6,7 +6,7 @@ var myPlayerID;
 var session = null;
 var gameEnv;
 
-var gameEnvUpdateCallBack = null;
+var gameEnvUpdateCallback = function(data){};
 
 //Update Server Game Env
 function updatePlayerOnServer(){
@@ -115,6 +115,8 @@ function onServerUpdatePlayerID(client, data){
 
 function onServerUpdateGameSession(client, data){
 	session = data;	
+	gameEnv = data.gameEnv;
+	console.log(session);
 }
 
 window.setInterval(50, function(){
