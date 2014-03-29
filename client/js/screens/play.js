@@ -42,6 +42,7 @@ game.PlayScreen = CustomScreen.extend({
 	updateEnvironment : function(gameEnv) {
 		// Update the position of any tanks that aren't our own.
 		// See client.js for gameEnv.
+		console.log("From play.js/updateGameEnvironment:" +sJSON.stringify(gameEnv));
 		for (var playerID in this.tanks) {
 			if (playerID == myPlayerID) continue;
 			
