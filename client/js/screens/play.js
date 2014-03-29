@@ -1,8 +1,7 @@
-var GameIsInSession = false;
+
 
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
-		GameIsInSession = true;
 
 		// Load the level.
 		me.levelDirector.loadLevel("bloodGultch");
@@ -80,6 +79,7 @@ game.PlayScreen = CustomScreen.extend({
 var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
 
 function updateGameEnvironment(gameEnv) {
+	console.log("Updating game environment");
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
 			var player = gameEnv.players[playerName]
