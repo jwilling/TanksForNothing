@@ -14,7 +14,7 @@ game.PlayScreen = CustomScreen.extend({
 		this.createTanks();
 		
 		// Set up a callback for when the environment is updated.
-		gameEnvUpdateCallback = updateEnvironment;
+		gameEnvUpdateCallback = this.updateEnvironment;
 	},
 	
 	createTanks : function() {
@@ -30,8 +30,8 @@ game.PlayScreen = CustomScreen.extend({
 			this.tanks[playerID] = tank;
 			me.game.world.addChild(tank);
 		}
-		console.log(gameEnv);
-		console.log(session);
+		console.log("gameEnv:" + JSON.stringify(gameEnv));
+		console.log("Session:" + JSON.stringify(session));
 		// Store our tank.
 		this.tank = this.tanks[myPlayerID];
 		this.tank.positionChangedHandler = function(x, y) {
@@ -79,14 +79,10 @@ game.PlayScreen = CustomScreen.extend({
 
 var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
 
-
-
-
 function updateGameEnvironment(gameEnv) {
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
-			var player = gameEnv.players[playerName];
-			
+			var player = gameEnv.players[playerName]
 			var spriteObject = idToSprite[playerName];
 			
 			spriteObject.moveToPoint(player.locX, player.locY);
