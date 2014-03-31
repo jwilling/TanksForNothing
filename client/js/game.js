@@ -33,20 +33,13 @@ var game = {
 					
 		// Show the splash screen.
 		me.state.change(STATE_SPLASH);
-	
-		// add our player entity in the entity pool
-  		 me.entityPool.add("mainPlayer", game.PlayerEntity);
-  		 me.entityPool.add("mainPlayerTurret", game.TurretEntity);
-  		 me.entityPool.add("bullet", game.BulletEntity, true);
 
-  		           
-  		 // enable the keyboard
- 		  me.input.bindKey(me.input.KEY.A,  "left");
- 		  me.input.bindKey(me.input.KEY.D, "right");
-  		  me.input.bindKey(me.input.KEY.W, "up");
-  		  me.input.bindKey(me.input.KEY.S, "down");
-  		  me.input.bindKey(me.input.KEY.SPACE, "space");
-  		  me.input.bindKey(me.input.KEY.LEFT, "rotateCountClock");
-  		  me.input.bindKey(me.input.KEY.RIGHT, "rotateClock");
+		// Bind the keyboard presses to named events.
+		me.input.bindKey(me.input.KEY.W, "up");
+		me.input.bindKey(me.input.KEY.A, "left");
+		me.input.bindKey(me.input.KEY.S, "down");
+		me.input.bindKey(me.input.KEY.D, "right");
+		me.input.bindKey(me.input.KEY.LEFT, "left_arrow");
+		me.input.bindKey(me.input.KEY.RIGHT, "right_arrow");
 	}
 };
