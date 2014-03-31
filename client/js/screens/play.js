@@ -13,20 +13,34 @@ game.PlayScreen = CustomScreen.extend({
 		this.createTanks();
 		
 		// Set up a callback for when the environment is updated.
+<<<<<<< HEAD
 		gameEnvUpdateCallback = this.updateEnvironment;
+=======
+		// TODO: re-enable once server starts working.
+		//gameEnvUpdateCallback = updateEnvironment;
+>>>>>>> c9106d9642b052b4a5ff1d4d3390ecd96ed48376
 	},
 	
 	createTanks : function() {
+		// TODO: TEMPORARY. Put in place until the server works.
+		gameEnv = {
+			players : [ new Player("player1"), new Player("player2") ]
+		}
+		myPlayerID = "player1";
+		
+		
 		this.tanks = {};
 		
 		// Iterate over the players in the game environment (client.js).
-		for (var playerID in gameEnv.players) {
-			var player = gameEnv.players[playerID];
+		for (var key in gameEnv.players) {
+			if (!gameEnv.players.hasOwnProperty(key)) continue;
+			
+			var player = gameEnv.players[key];
 			
 			// Create a new tank, associate it with the player, and
 			// add it to the world.
 			var tank = new TankSprite(player.locX, player.locY);
-			this.tanks[playerID] = tank;
+			this.tanks[player.playerID] = tank;
 			me.game.world.addChild(tank);
 		}
 		console.log("gameEnv:" + JSON.stringify(gameEnv));
@@ -53,23 +67,20 @@ game.PlayScreen = CustomScreen.extend({
 	},
 	
 	update : function() {
-		this.tank.setAccelerationX(0);
-		this.tank.setAccelerationY(0);
-			
-		if (me.input.isKeyPressed('left')) {
-			this.tank.setAccelerationX(-1);
-		}
-		if (me.input.isKeyPressed('right')) {
-			this.tank.setAccelerationX(1);
-		}
-		if (me.input.isKeyPressed('up')) {
-			this.tank.setAccelerationY(-1);
-		}
-		if (me.input.isKeyPressed('down')) {
-			this.tank.setAccelerationY(1);
-		}
+		// Set the appropriate movement on the tank by interpreting
+		// the currently-pressed keys.
+		this.tank.setMovingRight(me.input.isKeyPressed('right'));
+		this.tank.setMovingLeft(me.input.isKeyPressed('left'));
+		this.tank.setMovingDown(me.input.isKeyPressed('down'));
+		this.tank.setMovingUp(me.input.isKeyPressed('up'));
 		
-		return true;
+		this.tank.setRotatingTurretRight(me.input.isKeyPressed('right_arrow'));
+		this.tank.setRotatingTurretLeft(me.input.isKeyPressed('left_arrow'));
+		// We don't want to cause a full redraw, so return false.
+		//
+		// The sprites will trigger their own drawing updates if
+		// they need them.
+		return false;
 	},
 
 	onDestroyEvent: function() {
