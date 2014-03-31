@@ -15,14 +15,9 @@ game.resources = [
 	
 	
 	{name: "area01_level_tiles", type:"image", src: "data/img/map/area01_level_tiles.png"},
-	{name: "gripe_run_right", type:"image", src: "data/img/sprite/gripe_run_right.png"},
-    {name: "spinning_coin_gold",  type:"image", src: "data/img/sprite/spinning_coin_gold.png"},
-    {name: "testTank",  type:"image", src: "data/img/sprite/testTank.png"},
-    {name: "testTankBig",  type:"image", src: "data/img/sprite/testTankBig.png"},
-    {name: "testTurret",  type:"image", src: "data/img/sprite/testTurret.png"},
-    {name: "bulletTest",  type:"image", src: "data/img/sprite/bulletTest.png"},
 
 	{ name: "tank-body-red", type: "image", src: "data/img/sliced/tank-body-red.png" },
+	{ name: "tank-turret-red", type: "image", src: "data/img/sliced/tank-turret-red.png" },
 
 	/* Atlases 
 	 * @example
