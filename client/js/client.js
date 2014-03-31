@@ -6,7 +6,7 @@ var myPlayerID;
 var session = null;
 var gameEnv;
 
-var gameEnvUpdateCallBack = null;
+var gameEnvUpdateCallback = function(data){};
 
 //Update Server Game Env
 function updatePlayerOnServer(){
@@ -103,7 +103,9 @@ var setEventHandlers = function() {
 };
 
 function onServerUpdateGameEnv(client, data){
+	GameIsInSession = true;
 	gameEnv = data;
+	console.log(JSON.stringify(data));
 	gameEnvUpdateCallback(gameEnv);
 }
 
@@ -114,13 +116,18 @@ function onServerUpdatePlayerID(client, data){
 }
 
 function onServerUpdateGameSession(client, data){
+	console.log(JSON.stringify(data.gameEnv));
 	session = data;	
+	gameEnv = data.gameEnv;
+	console.log(session);
 }
 
-window.setInterval(50, function(){
+var GameIsInSession = false;
+window.setInterval(function(){
 	if(GameIsInSession){ //client/js/play.js
+		console.log("Requesting Game Env");
 		requestGameEnv();
 	}
-});
+}, 5000);
 
 initSocket();

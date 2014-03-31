@@ -1,8 +1,7 @@
-var GameIsInSession = false;
+
 
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
-		GameIsInSession = true;
 
 		// Load the level.
 		me.levelDirector.loadLevel("bloodGultch");
@@ -14,7 +13,7 @@ game.PlayScreen = CustomScreen.extend({
 		this.createTanks();
 		
 		// Set up a callback for when the environment is updated.
-		gameEnvUpdateCallback = updateEnvironment;
+		gameEnvUpdateCallback = this.updateEnvironment;
 	},
 	
 	createTanks : function() {
@@ -30,8 +29,8 @@ game.PlayScreen = CustomScreen.extend({
 			this.tanks[playerID] = tank;
 			me.game.world.addChild(tank);
 		}
-		console.log(gameEnv);
-		console.log(session);
+		console.log("gameEnv:" + JSON.stringify(gameEnv));
+		console.log("Session:" + JSON.stringify(session));
 		// Store our tank.
 		this.tank = this.tanks[myPlayerID];
 		this.tank.positionChangedHandler = function(x, y) {
@@ -43,6 +42,7 @@ game.PlayScreen = CustomScreen.extend({
 	updateEnvironment : function(gameEnv) {
 		// Update the position of any tanks that aren't our own.
 		// See client.js for gameEnv.
+		console.log("From play.js/updateGameEnvironment:" +sJSON.stringify(gameEnv));
 		for (var playerID in this.tanks) {
 			if (playerID == myPlayerID) continue;
 			
@@ -79,14 +79,11 @@ game.PlayScreen = CustomScreen.extend({
 
 var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
 
-
-
-
 function updateGameEnvironment(gameEnv) {
+	console.log("Updating game environment");
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
-			var player = gameEnv.players[playerName];
-			
+			var player = gameEnv.players[playerName]
 			var spriteObject = idToSprite[playerName];
 			
 			spriteObject.moveToPoint(player.locX, player.locY);

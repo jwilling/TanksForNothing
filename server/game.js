@@ -60,7 +60,7 @@ function GameEnv(sessionID){
 };
 
 GameEnv.prototype.addPlayer = function(playerID){
-	this.players[playerID] = Player();
+	this.players[playerID] = new Player(playerID);
 };
 
 GameEnv.prototype.removePlayer = function(playerID){
@@ -108,13 +108,14 @@ function Session(sessionOwner, settings){
 
 Session.prototype.newGame = function(){
 	this.gameEnv = new GameEnv();
+	this.gameEnv.sessionID = this.sessionID;
 };
 
 Session.prototype.setState = function(state_name){
 	this.state = sessionStates[state_name];
 };
 
-
+var ses;
 
 function init(){
 	socket = io.listen(50505);
@@ -181,8 +182,8 @@ function onClientUpdatePlayer(client, data){
 }
 
 function updateGameEnvironmentsForSession(sessionID){
-	for(clientID in session.gameEnv.players){
-		socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
+	for(clientID in sessions[sessionID].gameEnv.players){
+		socket.sockets.socket(clientID).emit("update_game_env", sessions[sessionID].gameEnv);
 	}
 }
 
@@ -215,6 +216,11 @@ function onClientHostGame(client, data){
 	var newSession = new Session(client.id, data);
 	newSession.newGame();
 	sessions[newSession.sessionID] = newSession;
+	ses = newSession;
+	players[client.id] = new Player(client.id);
+	players[client.id].sessionID = ses.sessionID;
+	newSession.gameEnv.players[client.id] = players[client.id];
+	
 	client.emit("update_game_session", newSession);
 }
 
@@ -223,6 +229,9 @@ function onClientExitGame(client, data){
 	var sessionID = data.sessionID;
 	var session = sessions[sessionID];
 	delete session.gameEnv.players[playerID];
+	for(clientID in session.gameEnv.players){
+		socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
+	}
 }
 
 
@@ -240,9 +249,11 @@ function onClientJoinGame(client, data){
 			var session = sessions[session_id];
 			var gameEnv = session.gameEnv;
 			players[client.id] = new Player(client.id);
-			console.log(session);
+			players[client.id].sessionID = session_id;
 			gameEnv.addPlayer(client.id);
-			client.emit("update_session", session);
+			session.gamEnv = gameEnv;
+			console.log(session);
+			console.log(session.gameEnv);
 			var player_count = 0;
 			for(var pid in gameEnv.players){
 				player_count++;
@@ -253,6 +264,7 @@ function onClientJoinGame(client, data){
 			for(clientID in session.gameEnv.players){
 				socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
 			}
+			client.emit("update_game_session", session);
 		}
 	}
 	if(empty){
@@ -263,12 +275,12 @@ function onClientJoinGame(client, data){
 
 function onClientMoveBody(client, data){
 	console.log("Client Moving Body");
-	var sessionID = data.sessionID;
+	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
 	player.locX = data.locX;
 	player.locY = data.locY;
-	//updateGameEnvironmentsForSession(sessionID);	
+	updateGameEnvironmentsForSession(sessionID);	
 }
 
 function onClientRotateBody(client, data){
@@ -309,7 +321,7 @@ function onClientEndCharge(client, data){
 
 function onClientRequestGameEnv(client, data){
 	console.log("Client requesting game");
-	var sessionID = data.sessionID;
+	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	client.emit("update_game_env", session.gameEnv);
 }
