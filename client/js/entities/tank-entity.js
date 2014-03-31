@@ -77,6 +77,29 @@ var TankSprite = PhysicalSprite.extend({
 		this.movingLeft = false;
 		this.movingUp = false;
 		this.movingDown = false;
+		
+		// Create a new sprite which is used as a turret.
+		this.turretSprite = new ImageSprite("tank-turret-red", 0, 0);
+		
+		// The anchor point should be specified in such a way
+		// as to allow the rotation to occur around the center of the
+		// tank. This was fudged until it looked right.
+		this.turretSprite.setAnchorPoint(0.2, 0.5);
+		me.game.world.addChild(this.turretSprite);
+	},
+	
+	moveToPoint : function(x, y) {
+		this.parent(x, y);
+		
+		// When we move, move the turret too!
+		//
+		// The offsets from the x and y coordinates
+		// were fudged. Because of the blur on the sprites
+		// it is extremely difficult to get the right origin
+		// for the tanks. TODO: make this better!
+		var turretX = x + 43;
+		var turretY = y + 15;
+		this.turretSprite.moveToPoint(turretX, turretY);
 	},
 	
 	setMovingRight : function(moving) {
@@ -97,6 +120,18 @@ var TankSprite = PhysicalSprite.extend({
 	setMovingDown : function(moving) {
 		this.movingDown = moving;
 		this.updateState();
+	},
+	
+	setRotatingTurretRight : function(rotating) {
+		if (rotating) {
+			this.turretSprite.setRotation(this.turretSprite.rotation + 2);
+		}
+	},
+	
+	setRotatingTurretLeft : function(rotating) {
+		if (rotating) {
+			this.turretSprite.setRotation(this.turretSprite.rotation - 2);
+		}
 	},
 	
 	updateState : function() {
@@ -120,5 +155,11 @@ var TankSprite = PhysicalSprite.extend({
 	
 	update : function() {
 		return this.parent();
-	}
+	},
+	
+	destroy : function() {
+		this.parent();
+		
+		me.game.world.removeChild(this.turretSprite);
+	},
 });

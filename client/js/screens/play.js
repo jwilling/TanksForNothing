@@ -69,6 +69,8 @@ game.PlayScreen = CustomScreen.extend({
 		this.tank.setMovingDown(me.input.isKeyPressed('down'));
 		this.tank.setMovingUp(me.input.isKeyPressed('up'));
 		
+		this.tank.setRotatingTurretRight(me.input.isKeyPressed('right_arrow'));
+		this.tank.setRotatingTurretLeft(me.input.isKeyPressed('left_arrow'));
 		// We don't want to cause a full redraw, so return false.
 		//
 		// The sprites will trigger their own drawing updates if
