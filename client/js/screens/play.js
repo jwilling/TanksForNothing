@@ -4,7 +4,7 @@ game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
 		// Load the level.
-		me.levelDirector.loadLevel("bloodGultch");
+		me.levelDirector.loadLevel("blue");
 		
 		// Reset the score.
 		game.data.score = 0;
@@ -49,7 +49,6 @@ game.PlayScreen = CustomScreen.extend({
 	updateEnvironment : function(gameEnv) {
 		// Update the position of any tanks that aren't our own.
 		// See client.js for gameEnv.
-		console.log("From play.js/updateGameEnvironment:" + JSON.stringify(gameEnv));
 		for (var playerID in idToSprite) {
 			if (playerID == myPlayerID) continue;
 			console.log("updating opponent player");
