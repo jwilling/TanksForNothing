@@ -3,8 +3,8 @@ var io = require("socket.io");
 //var express = require("express");
 
 var socket;
-var players; //maps player ids to player;
-var sessions;
+var players = {}; //maps player ids to player;
+var sessions = {};
 
 //helper func to count actual size of object. 
 //taken from http://stackoverflow.com/a/6700
@@ -60,7 +60,7 @@ function GameEnv(sessionID){
 };
 
 GameEnv.prototype.addPlayer = function(playerID){
-	this.players[playerID] = Player();
+	this.players[playerID] = new Player(playerID);
 };
 
 GameEnv.prototype.removePlayer = function(playerID){
@@ -93,9 +93,9 @@ GameEnv.prototype.addShot = function(shot){
 var sessionStates = {"acceptingPlayers":0 , "waitingStart":1, "waitingAllReady":2, "inGame":3, "displayingScores": 4 };
 
 function Session(sessionOwner, settings){
-	if(!settings){
+	if(settings != {}){
 		settings = {
-			"numPlayers":2,
+			"numPlayers":1,
 			"matchLength": 300,
 		};
 	}
@@ -108,14 +108,14 @@ function Session(sessionOwner, settings){
 
 Session.prototype.newGame = function(){
 	this.gameEnv = new GameEnv();
+	this.gameEnv.sessionID = this.sessionID;
 };
 
 Session.prototype.setState = function(state_name){
 	this.state = sessionStates[state_name];
 };
 
-var testSession = Session({});
-
+var ses;
 
 function init(){
 	socket = io.listen(50505);
@@ -168,8 +168,11 @@ var setEventHandlers = function() {
 			onClientUpdatePlayer(client, data);
 		});
 	});
-	//socket.sockets.on("disconnection", onSocketDisconnect);
+	socket.sockets.on("disconnection", function(client){
+		onClientExitGame(client, {});
+	});
 };
+
 
 function onClientUpdatePlayer(client, data){
 	var sessionID = data.sessionID;
@@ -179,11 +182,10 @@ function onClientUpdatePlayer(client, data){
 }
 
 function updateGameEnvironmentsForSession(sessionID){
-	for(clientID in session.gameEnv.players){
-		socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
+	for(clientID in sessions[sessionID].gameEnv.players){
+		socket.sockets.socket(clientID).emit("update_game_env", sessions[sessionID].gameEnv);
 	}
 }
-
 
 function onClientStartGame(client, data){
 	console.log("Client Starting Game");
@@ -212,7 +214,13 @@ function onClientReadyGame(client, data){
 function onClientHostGame(client, data){
 	console.log("Client Hosting Game");
 	var newSession = new Session(client.id, data);
+	newSession.newGame();
 	sessions[newSession.sessionID] = newSession;
+	ses = newSession;
+	players[client.id] = new Player(client.id);
+	players[client.id].sessionID = ses.sessionID;
+	newSession.gameEnv.players[client.id] = players[client.id];
+	
 	client.emit("update_game_session", newSession);
 }
 
@@ -221,7 +229,11 @@ function onClientExitGame(client, data){
 	var sessionID = data.sessionID;
 	var session = sessions[sessionID];
 	delete session.gameEnv.players[playerID];
+	for(clientID in session.gameEnv.players){
+		socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
+	}
 }
+
 
 /*
  * Look for open game and send back a session if there is one available.
@@ -230,31 +242,45 @@ function onClientExitGame(client, data){
  */
 function onClientJoinGame(client, data){
 	console.log("Client Joining Game");
+	empty = true;
 	for(var session_id in sessions){
+		empty = false;
 		if(sessions[session_id].state == sessionStates["acceptingPlayers"]){
 			var session = sessions[session_id];
 			var gameEnv = session.gameEnv;
 			players[client.id] = new Player(client.id);
+			players[client.id].sessionID = session_id;
 			gameEnv.addPlayer(client.id);
-			client.emit("update_session", session);
-			if(gameEnv.settings["numPlayers"] == genEnv.players.size()){
+			session.gamEnv = gameEnv;
+			console.log(session);
+			console.log(session.gameEnv);
+			var player_count = 0;
+			for(var pid in gameEnv.players){
+				player_count++;
+			}
+			if(session.settings["numPlayers"] == player_count){
 				session.setState = sessionStates["waitingStart"];
 			} 
 			for(clientID in session.gameEnv.players){
 				socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
 			}
+			client.emit("update_game_session", session);
 		}
 	}
+	if(empty){
+		onClientHostGame(client,data);
+	}
+	
 }
 
 function onClientMoveBody(client, data){
 	console.log("Client Moving Body");
-	var sessionID = data.sessionID;
+	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
 	player.locX = data.locX;
 	player.locY = data.locY;
-	//updateGameEnvironmentsForSession(sessionID);	
+	updateGameEnvironmentsForSession(sessionID);	
 }
 
 function onClientRotateBody(client, data){
@@ -295,7 +321,7 @@ function onClientEndCharge(client, data){
 
 function onClientRequestGameEnv(client, data){
 	console.log("Client requesting game");
-	var sessionID = data.sessionID;
+	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	client.emit("update_game_env", session.gameEnv);
 }
