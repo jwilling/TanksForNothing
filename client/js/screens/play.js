@@ -30,8 +30,7 @@ game.PlayScreen = CustomScreen.extend({
 			idToSprite[player.playerID] = tank;
 			me.game.world.addChild(tank);
 		}
-		console.log("gameEnv:" + JSON.stringify(gameEnv));
-		console.log("Session:" + JSON.stringify(session));
+
 		
 		this.tank = idToSprite[myPlayerID];
 		this.tank.changeHandler = function(x, y, bodyDirection, turretDirection) {
@@ -78,7 +77,6 @@ game.PlayScreen = CustomScreen.extend({
 });
 
 function updateGameEnvironment(gameEnv) {
-	console.log("Updating game environment:" + JSON.stringify(gameEnv));
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
 			var player = gameEnv.players[playerName];
