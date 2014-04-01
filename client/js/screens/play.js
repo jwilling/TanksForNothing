@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-
-
->>>>>>> master
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
@@ -79,24 +74,13 @@ game.PlayScreen = CustomScreen.extend({
 	}
 });
 
-<<<<<<< HEAD
 function updateGameEnvironment(gameEnv) {
 	console.log("Updating game environment");
 	for (var playerName in gameEnv.players) {
 		if (playerName != myPlayerID) {
 			var player = gameEnv.players[playerName]
 			var spriteObject = this.tanks[player.playerID];
-=======
-var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
 
-function updateGameEnvironment(gameEnv) {
-	console.log("Updating game environment");
-	for (var playerName in gameEnv.players) {
-		if(playerName != myPlayerID) {
-			var player = gameEnv.players[playerName]
-			var spriteObject = idToSprite[playerName];
->>>>>>> master
-			
 			spriteObject.moveToPoint(player.locX, player.locY);
 			// TODO: change turret and body direction.
 			//spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
