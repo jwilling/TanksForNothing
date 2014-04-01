@@ -135,13 +135,13 @@ var TankSprite = PhysicalSprite.extend({
 	
 	setRotatingTurretRight : function(rotating) {
 		if (rotating) {
-			this.turretSprite.setRotation(this.turretSprite.rotation + 2);
+			this.setTurretRotation(this.turretSprite.rotation + 2);
 		}
 	},
 	
 	setRotatingTurretLeft : function(rotating) {
 		if (rotating) {
-			this.turretSprite.setRotation(this.turretSprite.rotation - 2);
+			this.setTurretRotation(this.turretSprite.rotation - 2);
 		}
 	},
 	
