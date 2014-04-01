@@ -86,6 +86,9 @@ var TankSprite = PhysicalSprite.extend({
 		// tank. This was fudged until it looked right.
 		this.turretSprite.setAnchorPoint(0.2, 0.5);
 		me.game.world.addChild(this.turretSprite);
+		
+		// Move the turret to the initial position.
+		this.turretSprite.moveToPoint(this.x, this.y);
 	},
 	
 	moveToPoint : function(x, y) {
@@ -151,6 +154,10 @@ var TankSprite = PhysicalSprite.extend({
 		} else if (this.movingRight || this.movingLeft) {
 			this.setRotation(0);
 		}
+	},
+	
+	setTurretRotation : function(angle) {
+		this.turretSprite.setRotation(angle);
 	},
 	
 	update : function() {

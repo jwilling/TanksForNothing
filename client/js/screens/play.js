@@ -80,11 +80,13 @@ function updateGameEnvironment(gameEnv) {
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
 			var player = gameEnv.players[playerName];
-			var spriteObject = idToSprite[playerName];
+			
+			// Update the tank's position, rotation, and turret rotation.
+			var tank = idToSprite[playerName];
 
-			spriteObject.moveToPoint(player.locX, player.locY);
-			// TODO: change turret and body direction.
-			//spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
+			tank.moveToPoint(player.locX, player.locY);
+			tank.setRotation(player.bodyDirection);
+			tank.setTurretRotation(player.turretDirection);
 		}
 	}
 	
