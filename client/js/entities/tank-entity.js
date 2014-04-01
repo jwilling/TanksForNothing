@@ -89,6 +89,14 @@ var TankSprite = PhysicalSprite.extend({
 		
 		// Move the turret to the initial position.
 		this.turretSprite.moveToPoint(this.x, this.y);
+		
+		// The callback for whenever the position or turret
+		// rotation changes.
+		this.changeHandler = function(x, y, turretRotation) {};
+		
+		this.positionChangedHandler = function(x, y) {
+			this.changeHandler(this.x, this.y, this.turretSprite.rotation);
+		};
 	},
 	
 	moveToPoint : function(x, y) {
@@ -157,7 +165,10 @@ var TankSprite = PhysicalSprite.extend({
 	},
 	
 	setTurretRotation : function(angle) {
-		this.turretSprite.setRotation(angle);
+		if (this.rotation != angle) {
+			this.turretSprite.setRotation(angle);
+			this.changeHandler(this.x, this.y, this.turretSprite.rotation);
+		}
 	},
 	
 	update : function() {

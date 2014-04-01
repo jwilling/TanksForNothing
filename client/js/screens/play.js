@@ -34,7 +34,7 @@ game.PlayScreen = CustomScreen.extend({
 		console.log("Session:" + JSON.stringify(session));
 		
 		this.tank = idToSprite[myPlayerID];
-		this.tank.positionChangedHandler = function(x, y) {
+		this.tank.changeHandler = function(x, y, turretRotation) {
 			// Forward this onto the client to hand on to the server.
 			updatePlayerLocationOnServer(x, y);
 		};
