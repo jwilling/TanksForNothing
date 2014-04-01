@@ -128,6 +128,6 @@ window.setInterval(function(){
 		console.log("Requesting Game Env");
 		requestGameEnv();
 	}
-}, 50);
+}, 5000);
 
 initSocket();

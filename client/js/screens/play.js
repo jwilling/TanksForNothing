@@ -1,10 +1,10 @@
-
+var idToSprite = {};
 
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
 		// Load the level.
-		me.levelDirector.loadLevel("blue");
+		me.levelDirector.loadLevel("bloodGultch");
 		
 		// Reset the score.
 		game.data.score = 0;
@@ -14,15 +14,9 @@ game.PlayScreen = CustomScreen.extend({
 		
 		// Set up a callback for when the environment is updated.
 		gameEnvUpdateCallback = this.updateEnvironment;
-		// TODO: re-enable once server starts working.
-		//gameEnvUpdateCallback = updateEnvironment;
 	},
 	tanks: {},
-	createTanks : function() {
-		// TODO: TEMPORARY. Put in place until the server works.
-		
-		
-		var tank = idToSprite[myPlayerID];
+	createTanks : function() {		
 		
 		// Iterate over the players in the game environment (client.js).
 		for (var key in gameEnv.players) {
@@ -81,17 +75,16 @@ game.PlayScreen = CustomScreen.extend({
 	}
 });
 
-var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
-
 function updateGameEnvironment(gameEnv) {
 	console.log("Updating game environment");
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
 			var player = gameEnv.players[playerName];
 			var spriteObject = idToSprite[playerName];
-			
+
 			spriteObject.moveToPoint(player.locX, player.locY);
-			spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
+			// TODO: change turret and body direction.
+			//spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
 		}
 	}
 	
