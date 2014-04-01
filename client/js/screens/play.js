@@ -34,9 +34,9 @@ game.PlayScreen = CustomScreen.extend({
 		console.log("Session:" + JSON.stringify(session));
 		
 		this.tank = idToSprite[myPlayerID];
-		this.tank.changeHandler = function(x, y, turretRotation) {
+		this.tank.changeHandler = function(x, y, bodyDirection, turretDirection) {
 			// Forward this onto the client to hand on to the server.
-			updatePlayerLocationOnServer(x, y);
+			updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection);
 		};
 	},
 	
@@ -49,6 +49,8 @@ game.PlayScreen = CustomScreen.extend({
 			var player = gameEnv.players[playerID];
 			var tank = idToSprite[playerID];
 			tank.moveToPoint(player.locX, player.locY);
+			tank.setRotation(player.bodyDirection);
+			tank.setTurretRotation(player.turretDirection);
 		}		
 	},
 	
@@ -76,7 +78,7 @@ game.PlayScreen = CustomScreen.extend({
 });
 
 function updateGameEnvironment(gameEnv) {
-	console.log("Updating game environment");
+	console.log("Updating game environment:" + JSON.stringify(gameEnv));
 	for (var playerName in gameEnv.players) {
 		if(playerName != myPlayerID) {
 			var player = gameEnv.players[playerName];
@@ -86,6 +88,7 @@ function updateGameEnvironment(gameEnv) {
 
 			tank.moveToPoint(player.locX, player.locY);
 			tank.setRotation(player.bodyDirection);
+			console.log("player.turretDirection: " + player.turretDirection);
 			tank.setTurretRotation(player.turretDirection);
 		}
 	}
