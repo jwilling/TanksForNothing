@@ -18,14 +18,7 @@ game.PlayScreen = CustomScreen.extend({
 		//gameEnvUpdateCallback = updateEnvironment;
 	},
 	
-	createTanks : function() {
-		// TODO: TEMPORARY. Put in place until the server works.
-		gameEnv = {
-			players : [ new Player("player1"), new Player("player2") ]
-		}
-		myPlayerID = "player1";
-		
-		
+	createTanks : function() {		
 		this.tanks = {};
 		
 		// Iterate over the players in the game environment (client.js).
