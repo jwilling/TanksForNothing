@@ -86,6 +86,17 @@ var TankSprite = PhysicalSprite.extend({
 		// tank. This was fudged until it looked right.
 		this.turretSprite.setAnchorPoint(0.2, 0.5);
 		me.game.world.addChild(this.turretSprite);
+		
+		// Move the turret to the initial position.
+		this.turretSprite.moveToPoint(this.x, this.y);
+		
+		// The callback for whenever the position or turret
+		// rotation changes.
+		this.changeHandler = function(x, y, rotation, turretRotation) {};
+		
+		this.positionChangedHandler = function(x, y) {
+			this.changeHandler(this.x, this.y, this.rotation, this.turretSprite.rotation);
+		};
 	},
 	
 	moveToPoint : function(x, y) {
@@ -124,13 +135,13 @@ var TankSprite = PhysicalSprite.extend({
 	
 	setRotatingTurretRight : function(rotating) {
 		if (rotating) {
-			this.turretSprite.setRotation(this.turretSprite.rotation + 2);
+			this.setTurretRotation(this.turretSprite.rotation + 2);
 		}
 	},
 	
 	setRotatingTurretLeft : function(rotating) {
 		if (rotating) {
-			this.turretSprite.setRotation(this.turretSprite.rotation - 2);
+			this.setTurretRotation(this.turretSprite.rotation - 2);
 		}
 	},
 	
@@ -150,6 +161,13 @@ var TankSprite = PhysicalSprite.extend({
 			this.setRotation(90);
 		} else if (this.movingRight || this.movingLeft) {
 			this.setRotation(0);
+		}
+	},
+	
+	setTurretRotation : function(angle) {
+		if (this.turretSprite.rotation != angle) {
+			this.turretSprite.setRotation(angle);
+			this.changeHandler(this.x, this.y, this.rotation, this.turretSprite.rotation);
 		}
 	},
 	

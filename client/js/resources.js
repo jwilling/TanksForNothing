@@ -30,7 +30,8 @@ game.resources = [
 	 * {name: "example01", type: "tmx", src: "data/map/example01.json"},
  	 */
 	{name: "area01", type: "tmx", src: "data/map/area01.tmx"},
-	{name: "bloodGultch", type: "tmx",src: "data/map/bloodGultch.tmx"}
+	{name: "bloodGultch", type: "tmx",src: "data/map/bloodGultch.tmx"},
+	/*{name: "blue", type:"tmx", src: "data/map/blue.tmx"},*/
 	/* Background music. 
 	 * @example
 	 * {name: "example_bgm", type: "audio", src: "data/bgm/", channel : 1},

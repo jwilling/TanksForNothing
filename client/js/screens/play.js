@@ -1,3 +1,5 @@
+var idToSprite = {};
+
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
@@ -13,9 +15,8 @@ game.PlayScreen = CustomScreen.extend({
 		// Set up a callback for when the environment is updated.
 		gameEnvUpdateCallback = this.updateEnvironment;
 	},
-	
+	tanks: {},
 	createTanks : function() {		
-		this.tanks = {};
 		
 		// Iterate over the players in the game environment (client.js).
 		for (var key in gameEnv.players) {
@@ -26,35 +27,37 @@ game.PlayScreen = CustomScreen.extend({
 			// Create a new tank, associate it with the player, and
 			// add it to the world.
 			var tank = new TankSprite(player.locX, player.locY);
-			this.tanks[player.playerID] = tank;
+			idToSprite[player.playerID] = tank;
 			me.game.world.addChild(tank);
 		}
 		console.log("gameEnv:" + JSON.stringify(gameEnv));
 		console.log("Session:" + JSON.stringify(session));
-		// Store our tank.
-		this.tank = this.tanks[myPlayerID];
-		this.tank.positionChangedHandler = function(x, y) {
+		
+		this.tank = idToSprite[myPlayerID];
+		this.tank.changeHandler = function(x, y, bodyDirection, turretDirection) {
 			// Forward this onto the client to hand on to the server.
-			updatePlayerLocationOnServer(x, y);
-		}
+			updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection);
+		};
 	},
 	
 	updateEnvironment : function(gameEnv) {
 		// Update the position of any tanks that aren't our own.
 		// See client.js for gameEnv.
-		console.log("From play.js/updateGameEnvironment:" +sJSON.stringify(gameEnv));
-		for (var playerID in this.tanks) {
+		for (var playerID in idToSprite) {
 			if (playerID == myPlayerID) continue;
-			
+			console.log("updating opponent player");
 			var player = gameEnv.players[playerID];
-			var tank = this.tanks[playerID];
+			var tank = idToSprite[playerID];
 			tank.moveToPoint(player.locX, player.locY);
+			tank.setRotation(player.bodyDirection);
+			tank.setTurretRotation(player.turretDirection);
 		}		
 	},
 	
 	update : function() {
 		// Set the appropriate movement on the tank by interpreting
 		// the currently-pressed keys.
+		
 		this.tank.setMovingRight(me.input.isKeyPressed('right'));
 		this.tank.setMovingLeft(me.input.isKeyPressed('left'));
 		this.tank.setMovingDown(me.input.isKeyPressed('down'));
@@ -75,15 +78,18 @@ game.PlayScreen = CustomScreen.extend({
 });
 
 function updateGameEnvironment(gameEnv) {
-	console.log("Updating game environment");
+	console.log("Updating game environment:" + JSON.stringify(gameEnv));
 	for (var playerName in gameEnv.players) {
-		if (playerName != myPlayerID) {
-			var player = gameEnv.players[playerName]
-			var spriteObject = this.tanks[player.playerID];
+		if(playerName != myPlayerID) {
+			var player = gameEnv.players[playerName];
+			
+			// Update the tank's position, rotation, and turret rotation.
+			var tank = idToSprite[playerName];
 
-			spriteObject.moveToPoint(player.locX, player.locY);
-			// TODO: change turret and body direction.
-			//spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
+			tank.moveToPoint(player.locX, player.locY);
+			tank.setRotation(player.bodyDirection);
+			console.log("player.turretDirection: " + player.turretDirection);
+			tank.setTurretRotation(player.turretDirection);
 		}
 	}
 	
