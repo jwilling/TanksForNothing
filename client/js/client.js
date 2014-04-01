@@ -17,8 +17,9 @@ function requestGameEnv(){
 	socket.emit("request_game_env", {});
 }
 
-function updatePlayerLocationOnServer(locX, locY){
-	socket.emit("move_body", { "locX": locX, "locY": locY });
+function updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection){
+	socket.emit("update_player", {locX:x, locY:y, 
+		bodyDirection: bodyDirection, turretDirection: turretDirection});
 }
 
 function joinGame(){

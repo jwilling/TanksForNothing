@@ -175,10 +175,15 @@ var setEventHandlers = function() {
 
 
 function onClientUpdatePlayer(client, data){
-	var sessionID = data.sessionID;
-	var session = sessions[data.sessionID];
-	session.gameEnv.players[client.id] = data;
-	players[client.id] = data;
+	console.log("Client Moving Body / Turret: " + client.id + ": " + JSON.stringify(data));
+	var sessionID = players[client.id].sessionID;
+	var session = sessions[sessionID];
+	var player = session.gameEnv.players[client.id];
+	player.locX = data.locX;
+	player.locY = data.locY;
+	player.bodyDirection = data.bodyDirection;
+	player.turretDirection = data.turretDirection;
+	updateGameEnvironmentsForSession(sessionID);	
 }
 
 function updateGameEnvironmentsForSession(sessionID){
