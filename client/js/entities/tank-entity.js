@@ -165,7 +165,7 @@ var TankSprite = PhysicalSprite.extend({
 	},
 	
 	setTurretRotation : function(angle) {
-		if (this.rotation != angle) {
+		if (this.turretSprite.rotation != angle) {
 			this.turretSprite.setRotation(angle);
 			this.changeHandler(this.x, this.y, this.turretSprite.rotation);
 		}
