@@ -1,5 +1,3 @@
-
-
 game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
@@ -16,17 +14,19 @@ game.PlayScreen = CustomScreen.extend({
 		gameEnvUpdateCallback = this.updateEnvironment;
 	},
 	
-	createTanks : function() {
+	createTanks : function() {		
 		this.tanks = {};
 		
 		// Iterate over the players in the game environment (client.js).
-		for (var playerID in gameEnv.players) {
-			var player = gameEnv.players[playerID];
+		for (var key in gameEnv.players) {
+			if (!gameEnv.players.hasOwnProperty(key)) continue;
+			
+			var player = gameEnv.players[key];
 			
 			// Create a new tank, associate it with the player, and
 			// add it to the world.
 			var tank = new TankSprite(player.locX, player.locY);
-			this.tanks[playerID] = tank;
+			this.tanks[player.playerID] = tank;
 			me.game.world.addChild(tank);
 		}
 		console.log("gameEnv:" + JSON.stringify(gameEnv));
@@ -53,23 +53,20 @@ game.PlayScreen = CustomScreen.extend({
 	},
 	
 	update : function() {
-		this.tank.setAccelerationX(0);
-		this.tank.setAccelerationY(0);
-			
-		if (me.input.isKeyPressed('left')) {
-			this.tank.setAccelerationX(-1);
-		}
-		if (me.input.isKeyPressed('right')) {
-			this.tank.setAccelerationX(1);
-		}
-		if (me.input.isKeyPressed('up')) {
-			this.tank.setAccelerationY(-1);
-		}
-		if (me.input.isKeyPressed('down')) {
-			this.tank.setAccelerationY(1);
-		}
+		// Set the appropriate movement on the tank by interpreting
+		// the currently-pressed keys.
+		this.tank.setMovingRight(me.input.isKeyPressed('right'));
+		this.tank.setMovingLeft(me.input.isKeyPressed('left'));
+		this.tank.setMovingDown(me.input.isKeyPressed('down'));
+		this.tank.setMovingUp(me.input.isKeyPressed('up'));
 		
-		return true;
+		this.tank.setRotatingTurretRight(me.input.isKeyPressed('right_arrow'));
+		this.tank.setRotatingTurretLeft(me.input.isKeyPressed('left_arrow'));
+		// We don't want to cause a full redraw, so return false.
+		//
+		// The sprites will trigger their own drawing updates if
+		// they need them.
+		return false;
 	},
 
 	onDestroyEvent: function() {
@@ -77,17 +74,16 @@ game.PlayScreen = CustomScreen.extend({
 	}
 });
 
-var idToSprite = {}; //map playerID to playerSprite; var spriteObject = idToSprite[playerID]
-
 function updateGameEnvironment(gameEnv) {
 	console.log("Updating game environment");
 	for (var playerName in gameEnv.players) {
-		if(playerName != myPlayerID) {
+		if (playerName != myPlayerID) {
 			var player = gameEnv.players[playerName]
-			var spriteObject = idToSprite[playerName];
-			
+			var spriteObject = this.tanks[player.playerID];
+
 			spriteObject.moveToPoint(player.locX, player.locY);
-			spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
+			// TODO: change turret and body direction.
+			//spriteObject.bodyTurretRotation(player.bodyDirection, player.turretDirection);
 		}
 	}
 	
