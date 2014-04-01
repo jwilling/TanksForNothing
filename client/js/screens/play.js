@@ -4,8 +4,9 @@ game.PlayScreen = CustomScreen.extend({
 	onResetEvent: function() {
 
 		// Load the level.
-		me.levelDirector.loadLevel("bloodGultch");
-		
+		//me.levelDirector.loadLevel("bloodGultch");
+                me.levelDirector.loadLevel("blue");
+
 		// Reset the score.
 		game.data.score = 0;
 		

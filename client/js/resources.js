@@ -15,6 +15,7 @@ game.resources = [
 	
 	
 	{name: "area01_level_tiles", type:"image", src: "data/img/map/area01_level_tiles.png"},
+	{name: "blue_tiles", type:"image", src: "data/img/map/blue_tiles.png"},
 
 	{ name: "tank-body-red", type: "image", src: "data/img/sliced/tank-body-red.png" },
 	{ name: "tank-turret-red", type: "image", src: "data/img/sliced/tank-turret-red.png" },
@@ -31,7 +32,8 @@ game.resources = [
  	 */
 	{name: "area01", type: "tmx", src: "data/map/area01.tmx"},
 	{name: "bloodGultch", type: "tmx",src: "data/map/bloodGultch.tmx"},
-	/*{name: "blue", type:"tmx", src: "data/map/blue.tmx"},*/
+	{name: "blue", type:"tmx", src: "data/map/blue.tmx"},
+	{name:"blue_map_img", type:"image", src: "data/map/blue.png"},
 	/* Background music. 
 	 * @example
 	 * {name: "example_bgm", type: "audio", src: "data/bgm/", channel : 1},
