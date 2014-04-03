@@ -1,3 +1,6 @@
+// Namespace.
+this.tfn = this.tfn || {};
+
 var game = {
 	start : function() {
 		// Create the stage with the canvas associated with the
@@ -17,6 +20,28 @@ var game = {
 		// isn't very efficient, and it might be better to allow each
 		// object to refresh itself when needed.
 		createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-		createjs.Ticker.addEventListener("tick", this.stage); 
+		createjs.Ticker.addEventListener("tick", this.stage);
+		
+		// Start our game with the splash screen.
+		this.setScreenState(STATE_SPLASH);
 	},
+	
+	setScreenState : function(screenState) {
+		// Remove any current screens we have displayed in prepration
+		// for transitioning to the new screen.
+		if (this.currentScreen) {
+			this.stage.removeChild(this.currentScreen);
+			delete this.currentScreen;
+		}
+				
+		switch (screenState) {
+			case STATE_SPLASH: {
+				this.currentScreen = new tfn.TitleScreen();
+				break;
+			}
+			default: break;
+		}
+		
+		this.stage.addChild(this.currentScreen);
+	}
 }
