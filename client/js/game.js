@@ -43,6 +43,10 @@ var game = {
 				this.currentScreen = new tfn.TitleScreen();
 				break;
 			}
+			case STATE_MAIN_MENU: {
+				this.currentScreen = new tfn.MainMenuScreen();
+				break;
+			}
 			default: break;
 		}
 		
