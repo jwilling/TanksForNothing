@@ -22,8 +22,8 @@ var game = {
 		createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
 		createjs.Ticker.addEventListener("tick", this.stage);
 		
-		// Start our game with the splash screen.
-		this.setScreenState(STATE_SPLASH);
+		// Start our game with the preloading screen.
+		this.setScreenState(STATE_PRELOADING);
 	},
 	
 	setScreenState : function(screenState) {
@@ -31,10 +31,14 @@ var game = {
 		// for transitioning to the new screen.
 		if (this.currentScreen) {
 			this.stage.removeChild(this.currentScreen);
-			delete this.currentScreen;
+			this.currentScreen.onDestroyHandler();
 		}
 				
 		switch (screenState) {
+			case STATE_PRELOADING: {
+				this.currentScreen = new tfn.PreloadingScreen();
+				break;
+			}
 			case STATE_SPLASH: {
 				this.currentScreen = new tfn.TitleScreen();
 				break;
