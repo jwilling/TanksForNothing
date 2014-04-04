@@ -47,6 +47,10 @@ var game = {
 				this.currentScreen = new tfn.MainMenuScreen();
 				break;
 			}
+			case STATE_LOBBY_HOST_PREFS: {
+				this.currentScreen = new tfn.JoinPrefsScreen();
+				break;
+			}
 			default: break;
 		}
 		
