@@ -20,6 +20,7 @@ var game = {
 		// isn't very efficient, and it might be better to allow each
 		// object to refresh itself when needed.
 		createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+		createjs.Ticker.setFPS(60);
 		createjs.Ticker.addEventListener("tick", this.stage);
 		
 		// Start our game with the preloading screen.
@@ -59,6 +60,10 @@ var game = {
 			}
 			case STATE_COUNTDOWN: {
 				this.currentScreen = new tfn.CountdownScreen();
+				break;
+			}
+			case STATE_GAME: {
+				this.currentScreen = new tfn.GameScreen();
 				break;
 			}
 			default: break;
