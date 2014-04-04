@@ -3,43 +3,26 @@ tfn.MainMenuScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		baseConstructor.call(this);
 		
 		// Add the background.
-		var backgroundImage = tfn.preloader.getResult("background");
-		var background = new createjs.Bitmap(backgroundImage);
+		this.addImage("background", 0, 0);
 		
 		// Set up the new game button.
-		var newGameButtonImage = tfn.preloader.getResult("menu-button-new-game");
-		var newGameButton = new createjs.Bitmap(newGameButtonImage);
-		newGameButton.x = 399;
-		newGameButton.y = 200;
-		
-		// Set up the credits button.
-		var creditsButtonImage = tfn.preloader.getResult("menu-button-credits");
-		var creditsButton = new createjs.Bitmap(creditsButtonImage);
-		creditsButton.x = 399;
-		creditsButton.y = 290;
-		
-		// Set up the options button.
-		var optionsButtonImage = tfn.preloader.getResult("menu-button-options");
-		var optionsButton = new createjs.Bitmap(optionsButtonImage);
-		optionsButton.x = 399;
-		optionsButton.y = 380;
-		
-		// Set up the tutorial button.
-		var tutorialButtonImage = tfn.preloader.getResult("menu-button-tutorial");
-		var tutorialButton = new createjs.Bitmap(tutorialButtonImage);
-		tutorialButton.x = 399;
-		tutorialButton.y = 470;
-		
-		// Set up the callbacks.
-		newGameButton.on("click", function() {
+		this.addButton("menu-button-new-game", 399, 200, function() {
 			game.setScreenState(STATE_LOBBY_HOST_PREFS);
 		});
 		
-		// Add the children.
-		this.addChild(background);
-		this.addChild(newGameButton);
-		this.addChild(creditsButton);
-		this.addChild(optionsButton);
-		this.addChild(tutorialButton);
+		// Set up the credits button.
+		this.addButton("menu-button-credits", 399, 290, function() {
+
+		});
+		
+		// Set up the options button.
+		this.addButton("menu-button-options", 399, 380, function() {
+
+		});
+		
+		// Set up the tutorial button.
+		this.addButton("menu-button-tutorial", 399, 470, function() {
+			game.setScreenState(STATE_LOBBY_HOST_PREFS);
+		});
 	}
 });
