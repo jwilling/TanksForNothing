@@ -19,6 +19,22 @@
 		this.removeAllChildren();
 	}
 	
+	// A convenience function for setting up a static bitmap image.
+	Screen.prototype.addImage = function(imageName, x, y) {
+		var image = tfn.preloader.getResult(imageName);
+		var bitmap = new createjs.Bitmap(image);
+		bitmap.x = x;
+		bitmap.y = y;
+		
+		this.addChild(bitmap);
+		return bitmap;
+	}
+	
+	// A convience function for setting up a button with a click handler.
+	Screen.prototype.addButton = function(imageName, x, y, clickHandler) {
+		this.addImage(imageName, x, y).on("click", clickHandler);
+	}
+	
 	// Set up the prototype initialize function called whenever the
 	// screen object is created.
 	Screen.prototype.initialize = function() {
