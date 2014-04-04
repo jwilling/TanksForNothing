@@ -9,6 +9,11 @@
 	// Set up a default destroy handler function which should be called
 	// by the object that adds and remove this object on the screen.
 	Screen.prototype.onDestroyHandler = function() {
+		// Loop over all of the children and remove their listeners.
+		for (var i = 0; i < this.getNumChildren(); i++) {
+			this.getChildAt(i).removeAllEventListeners();
+		}
+		
 		// By default we want to remove all of our children when we are
 		// destroyed.
 		this.removeAllChildren();
