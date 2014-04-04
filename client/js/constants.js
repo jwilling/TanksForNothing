@@ -35,7 +35,7 @@ var STATE_LOBBY_HOST_PREFS = 6;
 var STATE_LOBBY_HOST = 7;
 
 // The lobby screen for players who aren't a host.
-var STATE_LOBBY_USER = 8;
+var STATE_LOBBY_JOIN = 8;
 
 // The countdown screen that displays when the game is
 // about to begin.
