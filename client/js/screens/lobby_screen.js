@@ -1,12 +1,14 @@
 tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function(isHost) {
 		baseConstructor.call(this);
-		
+				
 		// Add the background.
-		var backgroundImage = tfn.preloader.getResult("background");
-		var background = new createjs.Bitmap(backgroundImage);
+		this.addImage("background", 0, 0);
 		
-		// Add the children.
-		this.addChild(background);
+		this.addButton("menu-button-exit-lobby", 0, 0, function() {
+			console.log("hey!");
+		});
+		
+		console.log("Are we host? " + isHost);
 	}
 });

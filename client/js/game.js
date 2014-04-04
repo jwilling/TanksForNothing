@@ -53,7 +53,8 @@ var game = {
 			}
 			case STATE_LOBBY_HOST:
 			case STATE_LOBBY_JOIN: {
-				this.currentScreen = new tfn.LobbyScreen();
+				var isHost = (screenState == STATE_LOBBY_HOST);
+				this.currentScreen = new tfn.LobbyScreen(isHost);
 				break;
 			}
 			default: break;
