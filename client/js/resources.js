@@ -9,5 +9,5 @@ tfn.resources = [
 	{ id: "menu-button-join-game", src: "data/img/sliced/menu-button-join-game.png" },
 	{ id: "menu-button-exit-lobby", src: "data/img/sliced/menu-button-exit-lobby.png" },
 	{ id: "menu-button-start-game", src: "data/img/sliced/menu-button-start-game.png" },
-	{ id: "menu-title-waiting", src: "data/img/sliced/menu-title-waiting.png" },	
+	{ id: "menu-label-waiting", src: "data/img/sliced/menu-label-waiting.png" },
 ];
