@@ -57,6 +57,10 @@ var game = {
 				this.currentScreen = new tfn.LobbyScreen(isHost);
 				break;
 			}
+			case STATE_COUNTDOWN: {
+				this.currentScreen = new tfn.CountdownScreen();
+				break;
+			}
 			default: break;
 		}
 		

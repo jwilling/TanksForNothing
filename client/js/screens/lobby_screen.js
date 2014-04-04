@@ -17,7 +17,7 @@ tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// just set up a non-clickable waiting image.
 		if (isHost) {
 			this.addButton("menu-button-start-game", 552, 670, function() {
-				// For testing, jump straight to the game screen.
+				// Go to the countdown screen.
 				//
 				// TODO: server stuff.
 				game.setScreenState(STATE_COUNTDOWN);
