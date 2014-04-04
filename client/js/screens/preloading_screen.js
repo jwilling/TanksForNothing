@@ -1,5 +1,7 @@
 tfn.PreloadingScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function() {
+		baseConstructor.call(this);
+		
 		// Add a loading label.
 		var loadingLabel = new createjs.Text("Loading", "26px Futura", "white");
 		loadingLabel.x = (game.stage.canvas.width / 2) - (loadingLabel.getMeasuredWidth() / 2);

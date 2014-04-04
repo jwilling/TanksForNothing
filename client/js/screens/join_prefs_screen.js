@@ -1,5 +1,7 @@
 tfn.JoinPrefsScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function() {
+		baseConstructor.call(this);
+		
 		// Add the background.
 		var backgroundImage = tfn.preloader.getResult("background");
 		var background = new createjs.Bitmap(backgroundImage);
@@ -22,7 +24,7 @@ tfn.JoinPrefsScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		});
 		
 		joinGameButton.on("click", function() {
-			game.setScreenState(STATE_LOBBY_USER);
+			game.setScreenState(STATE_LOBBY_JOIN);
 		});
 		
 		// Add the children.
