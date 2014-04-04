@@ -1,6 +1,6 @@
 // Namespace.
 this.tfn = this.tfn || {};
-
+var stage;
 var game = {
 	start : function() {
 		// Create the stage with the canvas associated with the
@@ -51,9 +51,15 @@ var game = {
 				this.currentScreen = new tfn.JoinPrefsScreen();
 				break;
 			}
+			case STATE_LOBBY_HOST:
+			case STATE_LOBBY_JOIN: {
+				this.currentScreen = new tfn.LobbyScreen();
+				break;
+			}
 			default: break;
 		}
 		
+		this.currentScreenState = screenState;
 		this.stage.addChild(this.currentScreen);
 	}
 }
