@@ -5,7 +5,9 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Add a blank background image.
 		var bitmap = this.addImage("background-blank", 0, 0);
 		
-		// TODO: load map.
+		// Add the map image.
+		this.mapBitmap = this.addImage("map-blue", 0, 0);
+		
 				
 		var bitmap = new tfn.PhysicalBitmap("tank-body-red", 0, 0, 500);
 		this.addChild(bitmap);
@@ -15,13 +17,12 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		];
 		
 		this.tank = bitmap;
-		this.tank.regX = this.tank.image.width / 2;
-		this.tank.regY = this.tank.image.height / 2;
-		
+		this.tank.setAnchorPoint(0.5, 0.5);
+				
 		var me = this;
-		createjs.Ticker.addEventListener("tick", function(event) {
-			me.tick();
-		});
+		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
+		
+		setInterval(this.checkCollisions.bind(this), 500);
 	}
 
 	this.tick = function() {
@@ -50,5 +51,30 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 		
 		game.stage.update(event);
+	}
+	
+	this.checkCollisions = function() {
+		ndgmr.DEBUG = true;
+		var collisionIntersection = ndgmr.checkPixelCollision(this.tank, this.mapBitmap, 1, false);
+		if (collisionIntersection) {
+
+		} else {
+			console.log("no collision");
+			this.lastSafeX = this.tank.x;
+			this.lastSafeY = this.tank.y;
+			return;
+		}
+		
+		var savedX = this.tank.x;
+		var savedY = this.tank.y;
+		
+		// First test moving on the x axis.
+		this.tank.x = this.lastSafeX;
+		var collisionX = false;
+		var collisionY = false;
+		if (!ndgmr.checkPixelCollision(this.tank, this.mapBitmap, 1, false)) {
+			collisionX = true;
+			console.log("we collided on x!");
+		}
 	}
 });
