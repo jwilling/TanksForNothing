@@ -46,3 +46,13 @@ var STATE_GAME = 10;
 
 // The score screen that displays after the game.
 var STATE_SCORE = 11;
+
+// ***********************
+// Key code constants.
+// ***********************
+
+var KEY_LEFT = 37;
+var KEY_RIGHT = 39;
+var KEY_W = 87;
+var KEY_A = 65;
+var KEY_D = 68;
