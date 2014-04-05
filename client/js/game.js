@@ -21,7 +21,9 @@ var game = {
 		// object to refresh itself when needed.
 		createjs.Ticker.timingMode = createjs.Ticker.RAF;
 		createjs.Ticker.setFPS(60);
-		createjs.Ticker.addEventListener("tick", this.stage);
+
+		// Set up our own tracking of key events.
+		this.setupKeyTracking();
 		
 		// Start our game with the preloading screen.
 		this.setScreenState(STATE_PRELOADING);
@@ -71,5 +73,6 @@ var game = {
 		
 		this.currentScreenState = screenState;
 		this.stage.addChild(this.currentScreen);
+		this.currentScreen.onDisplayHandler();
 	}
 }

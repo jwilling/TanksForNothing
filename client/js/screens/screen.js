@@ -19,6 +19,14 @@
 		this.removeAllChildren();
 	}
 	
+	// Set up a default hander for when the screen has been added
+	// to the stage. Must be called by the object that adds and removes
+	// objects on the screen.
+	Screen.prototype.onDisplayHandler = function() {
+		// By default, redraw the stage.
+		game.stage.update();
+	}
+	
 	// A convenience function for setting up a static bitmap image.
 	Screen.prototype.addImage = function(imageName, x, y) {
 		var image = tfn.preloader.getResult(imageName);
