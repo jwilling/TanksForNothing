@@ -13,4 +13,5 @@ tfn.resources = [
 	{ id: "menu-label-waiting", src: "data/img/sliced/menu-label-waiting.png" },
 	{ id: "menu-button-ready", src: "data/img/sliced/menu-button-ready.png" },
 	{ id: "menu-image-instructions", src: "data/img/sliced/menu-image-instructions.png" },
+	{ id: "tank-body-red", src: "data/img/sliced/tank-body-red.png" },
 ];
