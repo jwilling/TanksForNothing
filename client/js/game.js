@@ -19,7 +19,7 @@ var game = {
 		// For now, we refresh the entire stage each tick. This really
 		// isn't very efficient, and it might be better to allow each
 		// object to refresh itself when needed.
-		createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
 		createjs.Ticker.setFPS(60);
 		createjs.Ticker.addEventListener("tick", this.stage);
 		
