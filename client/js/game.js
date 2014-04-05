@@ -29,6 +29,23 @@ var game = {
 		this.setScreenState(STATE_PRELOADING);
 	},
 	
+	setupKeyTracking : function() {
+		var keysPressed = {};
+		this.keysPressed = keysPressed;
+		
+		document.onkeydown = function(event) {			
+			keysPressed[event.which] = true;
+		}
+		
+		document.onkeyup = function(event) {
+			keysPressed[event.which] = false;
+		}
+	},
+	
+	isKeyPressed : function(key) {
+		return this.keysPressed[key] || false;
+	},
+	
 	setScreenState : function(screenState) {
 		// Remove any current screens we have displayed in prepration
 		// for transitioning to the new screen.
