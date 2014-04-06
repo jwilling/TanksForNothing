@@ -18,11 +18,8 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		
 		this.tank = bitmap;
 		this.tank.setAnchorPoint(0.5, 0.5);
-				
-		var me = this;
+
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
-		
-		setInterval(this.checkCollisions.bind(this), 500);
 	}
 
 	this.tick = function() {
@@ -50,31 +47,14 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.physicalObjects[i].tick(event);
 		}
 		
+		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap);
+		if (collisionDetector.collisions.LEFT) {
+			console.log("LEFT COLLISION!");
+		}	
+		if (collisionDetector.collisions.RIGHT) {
+			console.log("RIGHT COLLISION!");
+		}	
+				
 		game.stage.update(event);
-	}
-	
-	this.checkCollisions = function() {
-		ndgmr.DEBUG = true;
-		var collisionIntersection = ndgmr.checkPixelCollision(this.tank, this.mapBitmap, 1, false);
-		if (collisionIntersection) {
-
-		} else {
-			console.log("no collision");
-			this.lastSafeX = this.tank.x;
-			this.lastSafeY = this.tank.y;
-			return;
-		}
-		
-		var savedX = this.tank.x;
-		var savedY = this.tank.y;
-		
-		// First test moving on the x axis.
-		this.tank.x = this.lastSafeX;
-		var collisionX = false;
-		var collisionY = false;
-		if (!ndgmr.checkPixelCollision(this.tank, this.mapBitmap, 1, false)) {
-			collisionX = true;
-			console.log("we collided on x!");
-		}
 	}
 });

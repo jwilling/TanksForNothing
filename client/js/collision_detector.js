@@ -22,7 +22,7 @@
 		// Calculate the rotated rect derived from individual rotation
 		// of the four points.
 		var rotatedRect = this.createRotatedRect(rect, relativeAnchorPoint, physicalSprite.rotation);
-		
+
 		// Now we draw the bounding map into our sampling canvas.
 		this.drawBitmapIntoCanvas(boundingMap);
 		
@@ -60,7 +60,7 @@
 	
 	CollisionDetector.prototype.getCollisionRect = function(physicalSprite) {
 		var rect = new Rectangle();
-		
+				
 		// We have to get the four exact corners of the object.		
 		rect.p1 = new Point(physicalSprite.x, physicalSprite.y);
 		
