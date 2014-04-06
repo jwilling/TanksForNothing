@@ -50,7 +50,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}	
 		if (collisionDetector.collisions.RIGHT) {
 			console.log("RIGHT COLLISION!");
+		}
+		if (collisionDetector.collisions.TOP) {
+			console.log("TOP COLLISION!");
 		}	
+		if (collisionDetector.collisions.BOTTOM) {
+			console.log("BOTTOM COLLISION!");
+		}
 				
 		game.stage.update(event);
 	}
