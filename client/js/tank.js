@@ -1,8 +1,12 @@
 tfn.Tank = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 	this.constructor = function(x, y) {
-		baseConstructor.call(this, "tank-body-red", x, y, 500);
+		var imageName = "tank-body-red";
+		var maximumVelocity = 300;
+		var frictionCoefficient = 0;
+		var accelerationMagnitude = 500;
+
+		baseConstructor.call(this, imageName, x, y, maximumVelocity, frictionCoefficient, accelerationMagnitude);
 		
-		this.accelerationMagnitude = 200;
 		this.setAnchorPoint(0.5, 0.5);
 	}
 	
