@@ -21,6 +21,14 @@
 		this.y = y;
 	}
 	
+	// An object that stores values composed to make a rect.
+	function Rect(x, y, width, height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
 	// Utility function to clamp a numerical value between
 	// an upper and lower bounds.
 	function clamp(value, lowerBound, upperBound) {
@@ -97,6 +105,14 @@
 		this.currentPosition = new Vector2D(x, y);
 		this.x = x;
 		this.y = y;
+	}
+	
+	PhysicalBitmap.prototype.setCollisionRect = function(x, y, width, height) {
+		this.collisionRect = new Rect(x, y, width, height);
+	}
+	
+	PhysicalBitmap.prototype.getCollisionRect = function() {
+		return this.collisionRect || new Rect(0, 0, this.image.width, this.image.height);
 	}
 	
 	// Sets the anchor point of the object. This determines
