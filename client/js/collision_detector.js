@@ -87,21 +87,22 @@
 		var cos = Math.cos(rotation);
 		
 		var rotatedPoint = point.clone();
-		
-		// Translate to make the global anchor point the origin.	
-		rotatedPoint.x -= globalAnchorPoint.x;
-		rotatedPoint.y -= globalAnchorPoint.y;
-		
+
+		// Translate to make the global anchor point the origin.
+		var translatedPoint = point.clone();
+		translatedPoint.x -= globalAnchorPoint.x;
+		translatedPoint.y -= globalAnchorPoint.y;
+
 		// Apply the rotation matrix.
 		//    | cos0 -sin0 |
 		//    | sin0  cos0 |
-		rotatedPoint.x = rotatedPoint.x * cos - rotatedPoint.y * sin;
-		rotatedPoint.y = rotatedPoint.x * sin + rotatedPoint.y * cos;
+		rotatedPoint.x = cos * translatedPoint.x - sin * translatedPoint.y;
+		rotatedPoint.y = sin * translatedPoint.x + cos * translatedPoint.y;
 		
 		// Translate back.
 		rotatedPoint.x += globalAnchorPoint.x;
 		rotatedPoint.y += globalAnchorPoint.y;
-		
+			
 		return rotatedPoint;
 	}
 	
@@ -129,8 +130,8 @@
 	//
 	// Never displayed.
 	CollisionDetector.prototype.drawingCanvas =  document.createElement('canvas');
-	
-	CollisionDetector.prototype.drawBitmapIntoCanvas = function(bitmap) {
+		
+	CollisionDetector.prototype.drawBitmapIntoCanvas = function(bitmap) {		
 		// Set the correct width and height on the canvas.
 		this.drawingCanvas.width = bitmap.image.width;
 		this.drawingCanvas.height = bitmap.image.height;
@@ -201,12 +202,12 @@
 		//
 		// First construct the sampling points.
 		//     [top, bottom, left, right]
-		var samplingPoints = [sortedByY[0], sortedByY[2], sortedByX[0], sortedByX[2]];
+		var samplingPoints = [sortedByY[0], sortedByY[3], sortedByX[0], sortedByX[3]];
 		var resolution = 1;
 		
 		// Grab the canvas drawing context.
 		var ctx = this.drawingCanvas.getContext('2d');
-		
+
 		// Loop over the sample points and get the pixel data from
 		// the canvas.
 		var samplesPixelData = [];
