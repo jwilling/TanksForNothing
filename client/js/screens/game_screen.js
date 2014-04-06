@@ -8,37 +8,34 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Add the map image.
 		this.mapBitmap = this.addImage("map-blue", 0, 0);
 		
-				
-		var bitmap = new tfn.PhysicalBitmap("tank-body-red", 0, 0, 500);
-		this.addChild(bitmap);
-
-		this.physicalObjects = [
-			bitmap
-		];
+		// Create the tanks.
+		this.createTanks();
 		
-		this.tank = bitmap;
-		this.tank.setAnchorPoint(0.5, 0.5);
-
+		// Set up a ticker to redraw on the tick interval.
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
-
-	this.tick = function() {
-		// Default acceleration to 0, 0.
-		this.tank.setAcceleration(0, 0);
 	
-		if (game.isKeyPressed(KEY_W)) {
-			var radians = this.tank.rotation * (Math.PI / 180);
-			var acceleration = 200;
-			var x = acceleration * (Math.cos(radians));
-			var y = acceleration * (Math.sin(radians));
+	this.createTanks = function() {
+		this.physicalObjects = [
+			new tfn.Tank(0, 0)
+		];
 		
-			this.tank.setAcceleration(x, y);
+		this.tank = this.physicalObjects[0];
+		
+		for (var i = 0; i < this.physicalObjects.length; i++) {
+			this.addChild(this.physicalObjects[i]);
 		}
+	}
+
+	this.tick = function() {	
+		var shouldAccelerate = game.isKeyPressed(KEY_W);
+		this.tank.accelerate(shouldAccelerate);
+
 		if (game.isKeyPressed(KEY_A)) {			
-			this.tank.rotation -= 4;
+			this.tank.rotateLeft();
 		}
 		if (game.isKeyPressed(KEY_D)) {
-			this.tank.rotation += 4;
+			this.tank.rotateRight();
 		}
 		
 		// Send a tick event to all of the physical objects we're
