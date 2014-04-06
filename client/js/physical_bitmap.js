@@ -69,6 +69,7 @@
 	//
 	// Should be called by the parent every game tick.
 	PhysicalBitmap.prototype.tick = function(event) {
+
 		// Make sure we have a valid initial tick time.
 		if (this.lastTick < 0) {
 			this.lastTick = createjs.Ticker.getTime();
@@ -88,10 +89,16 @@
 		// First we calculate the acceleration. This will have a frictional
 		// force applied to it.
 		var acceleration = new Vector2D(this.acceleration.x, this.acceleration.y);
-		var accelerationModifierX = (this.currentVelocity.x >= 0 ? 1 : -1);
-		var accelerationModifierY = (this.currentVelocity.y >= 0 ? 1 : -1);
-		acceleration.x = acceleration.x - accelerationModifierX * this.accelerationMagnitude * this.friction;
-		acceleration.y = acceleration.y - accelerationModifierY * this.accelerationMagnitude * this.friction;
+		
+		// var radians = this.rotation * (Math.PI / 180);
+		// var accelerationModifierX = (this.currentVelocity.x >= 0 ? 1 : -1);
+		// var accelerationModifierY = (this.currentVelocity.y >= 0 ? 1 : -1);
+		// var frictionalMagnitudeX = this.accelerationMagnitude * Math.cos(radians);
+		// var frictionalMagnitudeY = this.accelerationMagnitude * Math.sin(radians);
+		// var frictionalAccelerationX = (this.acceleration.x != 0 ? this.acceleration.x : frictionalMagnitudeX);
+		// var frictionalAccelerationY = (this.acceleration.y != 0 ? this.acceleration.y : frictionalMagnitudeY);
+		// acceleration.x = acceleration.x - frictionalAccelerationX * this.friction;
+		// acceleration.y = acceleration.y - frictionalAccelerationY * this.friction;
 		
 		// Clamp the acceleration.
 		//acceleration.x = clamp(acceleration.x, -this.accelerationMagnitude, this.accelerationMagnitude);
@@ -102,7 +109,7 @@
 		var oldVelocity = this.currentVelocity;
 		var velocityX = this.currentVelocity.x + acceleration.x * timestep;
 		var velocityY = this.currentVelocity.y + acceleration.y * timestep;
-		
+				
 		// Clamp the velocity to the maximum velocity.
 		velocityX = clamp(velocityX, -this.maximumVelocity.x, this.maximumVelocity.x);
 		velocityY = clamp(velocityY, -this.maximumVelocity.y, this.maximumVelocity.y);
@@ -111,12 +118,12 @@
 		// specific direction, we shouldn't let the frictional
 		// acceleration cause the body to drift in the opposite
 		// direction.
-		if (this.shouldZeroVelocity(this.acceleration.x, this.lastAppliedAcceleration.x, velocityX, this.currentVelocity.x)) {
-			velocityX = 0;	
-		}
-		if (this.shouldZeroVelocity(this.acceleration.y, this.lastAppliedAcceleration.y, velocityY, this.currentVelocity.y)) {
-			velocityY = 0;	
-		}
+		// if (this.shouldZeroVelocity(this.acceleration.x, this.lastAppliedAcceleration.x, velocityX, this.currentVelocity.x)) {
+		// 	velocityX = 0;	
+		// }
+		// if (this.shouldZeroVelocity(this.acceleration.y, this.lastAppliedAcceleration.y, velocityY, this.currentVelocity.y)) {
+		// 	velocityY = 0;	
+		// }
 		
 		// Calculate the position.
 		//     x = x0 + (v0 + v) * 0.5 * dt
@@ -134,15 +141,15 @@
 		if (this.acceleration.y != 0) this.lastAppliedAcceleration.y = this.acceleration.y;
 	}
 	
-	PhysicalBitmap.prototype.shouldZeroVelocity = function(acceleration, lastAppliedAcceleration, proposedVelocity, currentVelocity) {
-		if (acceleration != 0) {
-			return false;
-		}
-		
-		return (currentVelocity == 0
-			|| lastAppliedAcceleration < 0 && proposedVelocity >= currentVelocity && proposedVelocity > 0
-			|| lastAppliedAcceleration > 0 && proposedVelocity <= currentVelocity && proposedVelocity < 0);
-	}
+	// PhysicalBitmap.prototype.shouldZeroVelocity = function(acceleration, lastAppliedAcceleration, proposedVelocity, currentVelocity) {
+	// 	if (acceleration != 0) {
+	// 		return false;
+	// 	}
+	// 	
+	// 	return (currentVelocity == 0
+	// 		|| lastAppliedAcceleration < 0 && proposedVelocity >= currentVelocity && proposedVelocity > 0
+	// 		|| lastAppliedAcceleration > 0 && proposedVelocity <= currentVelocity && proposedVelocity < 0);
+	// }
 	
 	// Sets the position of the bitmap.
 	//
