@@ -7,8 +7,14 @@
 	//               x — the x origin of the bitmap
 	//               y - the y origin of the bitmap
 	// maximumVelocity - the maximum speed the object can go
-	var PhysicalBitmap = function(imageName, x, y, maximumVelocity) {
-		this.initialize(imageName, x, y, maximumVelocity);
+	//        friction - the friction applied to the object (0 - 1)
+	//   a...Magnitude - the maximum acceleration applied to the object
+	var PhysicalBitmap = function(imageName, x, y, maximumVelocity, friction, accelerationMagnitude) {
+		this.initialize(imageName, x, y);
+		
+		this.friction = friction || 0;
+		this.maximumVelocity = new Vector2D(maximumVelocity, maximumVelocity);
+		this.accelerationMagnitude = accelerationMagnitude;
 	}
 	
 	var prototype = new createjs.Bitmap();
@@ -36,15 +42,15 @@
 	}
 	
 	// Initializer.
-	PhysicalBitmap.prototype.initialize = function(imageName, x, y, maximumVelocity) {
+	PhysicalBitmap.prototype.initialize = function(imageName, x, y) {
 		this.bitmap_initialize();
 		
-		// Set up our initial values.
+		// Set up our initial (internal) values.
 		this.lastTick = -Infinity;
 		this.acceleration = new Vector2D(0, 0);
 		this.currentVelocity = new Vector2D(0, 0);
-		this.currentPosition = new Vector2D(0, 0);
-		this.maximumVelocity = new Vector2D(maximumVelocity, maximumVelocity);
+		this.currentPosition = new Vector2D(x, y);
+		this.lastAppliedAcceleration = new Vector2D(0, 0);
 		this.anchorPoint = new Vector2D(0, 0);
 		
 		// Set up the image.
@@ -79,23 +85,63 @@
 		// integration of the velocity, meaning over time it will
 		// not drift from the correct values, regardless of the timestep.
 		//
-		// We first will calculate the current velocity.
+		// First we calculate the acceleration. This will have a frictional
+		// force applied to it.
+		var acceleration = new Vector2D(this.acceleration.x, this.acceleration.y);
+		var accelerationModifierX = (this.currentVelocity.x >= 0 ? 1 : -1);
+		var accelerationModifierY = (this.currentVelocity.y >= 0 ? 1 : -1);
+		acceleration.x = acceleration.x - accelerationModifierX * this.accelerationMagnitude * this.friction;
+		acceleration.y = acceleration.y - accelerationModifierY * this.accelerationMagnitude * this.friction;
+		
+		// Clamp the acceleration.
+		//acceleration.x = clamp(acceleration.x, -this.accelerationMagnitude, this.accelerationMagnitude);
+		//acceleration.y = clamp(acceleration.y, -this.accelerationMagnitude, this.accelerationMagnitude);
+							
+		// Next we calculate the velocity.
 		//     v = v + a * dt
 		var oldVelocity = this.currentVelocity;
-		this.currentVelocity.x = this.currentVelocity.x + this.acceleration.x * timestep;
-		this.currentVelocity.y = this.currentVelocity.y + this.acceleration.y * timestep;
+		var velocityX = this.currentVelocity.x + acceleration.x * timestep;
+		var velocityY = this.currentVelocity.y + acceleration.y * timestep;
 		
 		// Clamp the velocity to the maximum velocity.
-		this.currentVelocity.x = clamp(this.currentVelocity.x, -this.maximumVelocity.x, this.maximumVelocity.x);
-		this.currentVelocity.y = clamp(this.currentVelocity.y, -this.maximumVelocity.y, this.maximumVelocity.y);
+		velocityX = clamp(velocityX, -this.maximumVelocity.x, this.maximumVelocity.x);
+		velocityY = clamp(velocityY, -this.maximumVelocity.y, this.maximumVelocity.y);
+		
+		// If we're not actively applying an acceleration in a 
+		// specific direction, we shouldn't let the frictional
+		// acceleration cause the body to drift in the opposite
+		// direction.
+		if (this.shouldZeroVelocity(this.acceleration.x, this.lastAppliedAcceleration.x, velocityX, this.currentVelocity.x)) {
+			velocityX = 0;	
+		}
+		if (this.shouldZeroVelocity(this.acceleration.y, this.lastAppliedAcceleration.y, velocityY, this.currentVelocity.y)) {
+			velocityY = 0;	
+		}
 		
 		// Calculate the position.
 		//     x = x0 + (v0 + v) * 0.5 * dt
-		var positionX = this.currentPosition.x + (oldVelocity.x + this.currentVelocity.x) * 0.5 * timestep;
-		var positionY = this.currentPosition.y + (oldVelocity.y + this.currentVelocity.y) * 0.5 * timestep;
+		var positionX = this.currentPosition.x + (oldVelocity.x + velocityX) * 0.5 * timestep;
+		var positionY = this.currentPosition.y + (oldVelocity.y + velocityY) * 0.5 * timestep;
+		
+		// Update the stored velocity.
+		this.currentVelocity = new Vector2D(velocityX, velocityY);
 		
 		// Update the position.
 		this.setPosition(positionX, positionY);
+		
+		// Update the last-applied acceleration.
+		if (this.acceleration.x != 0) this.lastAppliedAcceleration.x = this.acceleration.x;
+		if (this.acceleration.y != 0) this.lastAppliedAcceleration.y = this.acceleration.y;
+	}
+	
+	PhysicalBitmap.prototype.shouldZeroVelocity = function(acceleration, lastAppliedAcceleration, proposedVelocity, currentVelocity) {
+		if (acceleration != 0) {
+			return false;
+		}
+		
+		return (currentVelocity == 0
+			|| lastAppliedAcceleration < 0 && proposedVelocity >= currentVelocity && proposedVelocity > 0
+			|| lastAppliedAcceleration > 0 && proposedVelocity <= currentVelocity && proposedVelocity < 0);
 	}
 	
 	// Sets the position of the bitmap.
