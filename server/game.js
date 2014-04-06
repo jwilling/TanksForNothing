@@ -58,6 +58,7 @@ function GameEnv(sessionID){
 	this.players = {};
 	this.shots = [];
 	this.sessionID = sessionID;
+	this.lastEmit = new Date();
 };
 
 GameEnv.prototype.addPlayer = function(playerID){
@@ -192,8 +193,14 @@ function onClientUpdatePlayer(client, data){
 }
 
 function updateGameEnvironmentsForSession(sessionID){
-	for(clientID in sessions[sessionID].gameEnv.players){
-		socket.sockets.socket(clientID).emit("update_game_env", sessions[sessionID].gameEnv);
+	var session = sessions[sessionID];
+	var now = new Date();
+	var timeSinceLastEmit = now - session.lastEmit;
+	if (timeSinceLastEmit > 17) {
+		session.lastEmit = now;
+		for (clientID in sessions[sessionID].gameEnv.players) {
+			socket.sockets.socket(clientID).emit("update_game_env", sessions[sessionID].gameEnv);
+		}
 	}
 }
 
