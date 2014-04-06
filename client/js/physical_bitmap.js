@@ -168,6 +168,21 @@
 		return this.collisionRect || new Rect(0, 0, this.image.width, this.image.height);
 	}
 	
+	PhysicalBitmap.prototype.setCollisions = function(collisions) {
+		if (collisions.LEFT) {
+			this.currentVelocity.x *= -1;
+		}
+		if (collisions.RIGHT) {
+			this.currentVelocity.x *= -1;
+		}
+		if (collisions.TOP) {
+			this.currentVelocity.y *= -1;
+		}
+		if (collisions.BOTTOM) {
+			this.currentVelocity.y *= -1;
+		}
+	}
+	
 	// Sets the anchor point of the object. This determines
 	// both the point where the object will rotate around, as
 	// well as the point at which setting the position will

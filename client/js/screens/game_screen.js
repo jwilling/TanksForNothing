@@ -17,7 +17,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	
 	this.createTanks = function() {
 		this.physicalObjects = [
-			new tfn.Tank(0, 0)
+			new tfn.Tank(90, 90)
 		];
 		
 		this.tank = this.physicalObjects[0];
@@ -38,26 +38,15 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.tank.rotateRight();
 		}
 		
+		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap);
+		this.tank.setCollisions(collisionDetector.collisions);
+		
 		// Send a tick event to all of the physical objects we're
 		// simulating.			
 		for (var i = 0; i < this.physicalObjects.length; i++) {
 			this.physicalObjects[i].tick(event);
 		}
-		
-		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap);
-		if (collisionDetector.collisions.LEFT) {
-			console.log("LEFT COLLISION!");
-		}	
-		if (collisionDetector.collisions.RIGHT) {
-			console.log("RIGHT COLLISION!");
-		}
-		if (collisionDetector.collisions.TOP) {
-			console.log("TOP COLLISION!");
-		}	
-		if (collisionDetector.collisions.BOTTOM) {
-			console.log("BOTTOM COLLISION!");
-		}
-				
+
 		game.stage.update(event);
 	}
 });
