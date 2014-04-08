@@ -11,6 +11,9 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Create the tanks.
 		this.createTanks();
 		
+		//Health Bar
+		this.createHealthBar();
+		
 		// Set up a ticker to redraw on the tick interval.
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
@@ -25,6 +28,15 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		for (var i = 0; i < this.physicalObjects.length; i++) {
 			this.addChild(this.physicalObjects[i]);
 		}
+	}
+	
+	this.createHealthBar = function() {
+		var healthBar = new createjs.Graphics();
+		
+		healthBar.setStrokeStyle(1);
+		healthBar.beginStroke(createjs.Graphics.getRGB(0,0,0));
+		healthBar.beginFill(createjs.Graphics.getRGB(255,0,0));
+		healthBar.drawRect(100,100,50,100);
 	}
 
 	this.tick = function() {
