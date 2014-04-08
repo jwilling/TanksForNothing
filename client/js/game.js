@@ -27,6 +27,9 @@ var game = {
 		
 		// Start our game with the preloading screen.
 		this.setScreenState(STATE_PRELOADING);
+		
+		// Call our tick function when the game tick occurs.
+		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	},
 	
 	setupKeyTracking : function() {
@@ -44,6 +47,19 @@ var game = {
 	
 	isKeyPressed : function(key) {
 		return this.keysPressed[key] || false;
+	},
+	
+	tick : function(event) {
+		// Make sure we have a valid initial tick time.
+		if (this.lastTick < 0) {
+			this.lastTick = createjs.Ticker.getTime();
+		}
+		
+		// Calculate the delta since the last tick.
+		var currentTime = createjs.Ticker.getTime();
+		var timestep = (currentTime - this.lastTick) / 1000;
+		this.lastTick = currentTime;
+		tfn.lastTimestep = timestep;
 	},
 	
 	setScreenState : function(screenState) {
