@@ -54,6 +54,12 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		if (game.isKeyPressed(KEY_D)) {
 			this.tank.rotateRight();
 		}
+		if (game.isKeyPressed(KEY_LEFT)) {
+			this.tank.rotateTurretLeft();
+		}
+		if (game.isKeyPressed(KEY_RIGHT)) {
+			this.tank.rotateTurretRight();
+		}
 		
 		var collisionDetector = new tfn.CollisionDetector(this.tank.getCollisionRect(), this.mapBitmap, "map");
 		this.tank.setCollisions(collisionDetector.collisions);

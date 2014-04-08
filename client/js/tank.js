@@ -9,6 +9,7 @@
 	Tank.prototype.initialize = function(x, y) {
 		this.container_initialize();
 				
+		this.rotationalVelocity = 200;
 		this.initializeTank();
 		this.initializeTurret();
 		this.setPosition(x, y);
@@ -77,11 +78,19 @@
 	}
 	
 	Tank.prototype.rotateRight = function() {
-		this.tankBody.rotation += tfn.lastTimestep * 200;
+		this.tankBody.rotation += tfn.lastTimestep * this.rotationalVelocity;
 	}
 	
 	Tank.prototype.rotateLeft = function() {
-		this.tankBody.rotation -= tfn.lastTimestep * 200;
+		this.tankBody.rotation -= tfn.lastTimestep * this.rotationalVelocity;
+	}
+	
+	Tank.prototype.rotateTurretLeft = function() {
+		this.turret.rotation -= tfn.lastTimestep * this.rotationalVelocity;
+	}
+	
+	Tank.prototype.rotateTurretRight = function() {
+		this.turret.rotation += tfn.lastTimestep * this.rotationalVelocity;
 	}
 	
 	Tank.prototype.setCollisions = function(collisions) {	
