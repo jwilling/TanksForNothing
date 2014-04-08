@@ -50,12 +50,13 @@ tfn.Tank = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.setCollisions = function(collisions) {
-		if (collisions.COLLISION) {
-			// Reset our rotation and position back to the 
-			// last known safe values.
-			this.rotation = this.lastKnownSafeRotation;
-			this.setPosition(this.lastKnownSafePosition.x, this.lastKnownSafePosition.y);
-		} else {
+		if (collisions.LEFT || collisions.RIGHT) {
+			this.setPosition(this.lastKnownSafePosition.x, this.currentPosition.y);
+		} else if (collisions.TOP || collisions.BOTTOM) {
+			this.setPosition(this.currentPosition.x, this.lastKnownSafePosition.y);
+		}
+		
+		if (!collisions.COLLISION) {
 			this.lastKnownSafePosition = this.currentPosition;
 			this.lastKnownSafeRotation = this.rotation;
 		}
