@@ -27,18 +27,23 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 	}
 
-	this.tick = function() {	
-		var shouldAccelerate = game.isKeyPressed(KEY_W);
-		this.tank.accelerate(shouldAccelerate);
-
-		if (game.isKeyPressed(KEY_A)) {			
+	this.tick = function() {
+		//this.tank.stop();
+		
+		if (game.isKeyPressed(KEY_W)) {
+			this.tank.moveForward();
+		}
+		if (game.isKeyPressed(KEY_S)) {
+			this.tank.moveBackward();
+		}
+		if (game.isKeyPressed(KEY_A)) {
 			this.tank.rotateLeft();
 		}
 		if (game.isKeyPressed(KEY_D)) {
 			this.tank.rotateRight();
 		}
 		
-		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap);
+		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap, "map");
 		this.tank.setCollisions(collisionDetector.collisions);
 		
 		// Send a tick event to all of the physical objects we're
