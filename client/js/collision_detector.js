@@ -5,12 +5,14 @@
 		this.y = y || 0;
 	}
 	
-	var CollisionDetector = function(physicalSprite, boundingMap) {
-		// FIND 4 POINTS
-		// CHECK those points on pixels of bounding map
-		// IF any of those intersect, we have a collision
+	// Perform a collision test with the specified physical sprite, bounding map
+	// and identifier. The identifier should be unique between bounding maps, as
+	// the map itself is cached internally.
+	var CollisionDetector = function(physicalSprite, boundingMap, identifier) {
+		// Store the identifier and bitmap.
+		this.identifier = identifier;
+		this.bitmap = boundingMap;
 		
-
 		// Get the collision rect from the object.
 		var rect = this.getCollisionRect(physicalSprite);
 
@@ -23,9 +25,6 @@
 		// of the four points.
 		var rotatedRect = this.createRotatedRect(rect, relativeAnchorPoint, physicalSprite.rotation);
 
-		// Now we draw the bounding map into our sampling canvas.
-		this.drawBitmapIntoCanvas(boundingMap);
-		
 		// Finally actually check for collisions.
 		this.calculateCollisions(rotatedRect);
 	}
@@ -34,7 +33,8 @@
 		LEFT : false,
 		RIGHT : false,
 		TOP : false,
-		BOTTOM : false
+		BOTTOM : false,
+		COLLISION : false // whether any collisions occurred
 	}
 	
 	// Convenience function to clone a point.
@@ -126,23 +126,40 @@
 		return new Rectangle(p1, p2, p3, p4);
 	}
 	
-	// The canvas that is used for sampling the bounding map.
+	// A cache for canvas elements used for sampling pixel data.
+	var canvasCache = { };
+	
+	// Returns the canvas for the specified identifier with
+	// the bitmap already drawn into it.
 	//
-	// Never displayed.
-	CollisionDetector.prototype.drawingCanvas =  document.createElement('canvas');
+	// If it doesn't already exist, it will be created, and
+	// the bitmap will be drawn into it.
+	CollisionDetector.prototype.cachedSamplingCanvas = function() {
+		var canvas = canvasCache[this.identifier];
 		
-	CollisionDetector.prototype.drawBitmapIntoCanvas = function(bitmap) {		
+		if (!canvas) {
+			// Create the canvas.
+			canvas = document.createElement('canvas');
+			canvasCache[this.identifier] = canvas;
+			
+			// Draw the bitmap into it. This only should be done once
+			// for performance reasons.
+			this.drawBitmapIntoCanvas(canvas);
+		}
+		
+		return canvas;
+	}
+		
+	CollisionDetector.prototype.drawBitmapIntoCanvas = function(canvas) {
 		// Set the correct width and height on the canvas.
-		this.drawingCanvas.width = bitmap.image.width;
-		this.drawingCanvas.height = bitmap.image.height;
+		var bitmap = this.bitmap;
+		canvas.width = bitmap.image.width;
+		canvas.height = bitmap.image.height;
 		
 		// Get and clear the drawing context.
-		var ctx = this.drawingCanvas.getContext('2d');
-		ctx.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
-		
-		// Save the context.
-		ctx.save();
-		
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 		// Draw the bitmap into the context.
 		//
 		// Rotate the context.
@@ -159,9 +176,6 @@
 		
 		// Draw into our drawing context.
 		ctx.drawImage(bitmap.image, bitmap.x, bitmap.y, bitmap.image.width, bitmap.image.height);
-		
-		// Restore the settings.
-		ctx.restore();
 	}
 	
 	CollisionDetector.prototype.calculateCollisions = function(rotatedRect) {
@@ -206,7 +220,8 @@
 		var resolution = 1;
 		
 		// Grab the canvas drawing context.
-		var ctx = this.drawingCanvas.getContext('2d');
+		var canvas = this.cachedSamplingCanvas();
+		var ctx = canvas.getContext('2d');
 
 		// Loop over the sample points and get the pixel data from
 		// the canvas.
@@ -223,6 +238,7 @@
 		this.collisions.BOTTOM = (samplesPixelData[1][3] > 0);
 		this.collisions.LEFT = (samplesPixelData[2][3] > 0);
 		this.collisions.RIGHT = (samplesPixelData[3][3] > 0);
+		this.collisions.COLLISION = this.collisions.TOP || this.collisions.BOTTOM || this.collisions.LEFT || this.collisions.RIGHT;
 	}
 	
 	tfn.CollisionDetector = CollisionDetector;
