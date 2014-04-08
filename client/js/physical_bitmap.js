@@ -65,11 +65,8 @@
 		this.acceleration = new Vector2D(accelerationX, accelerationY);
 	}
 	
-	// The function that simulates movement on the physical object.
-	//
-	// Should be called by the parent every game tick.
-	PhysicalBitmap.prototype.tick = function(event) {
-
+	// Updates the last tick and returns the current timestep.
+	PhysicalBitmap.prototype.performTimestep = function() {
 		// Make sure we have a valid initial tick time.
 		if (this.lastTick < 0) {
 			this.lastTick = createjs.Ticker.getTime();
@@ -79,6 +76,15 @@
 		var currentTime = createjs.Ticker.getTime();
 		var timestep = (currentTime - this.lastTick) / 1000;
 		this.lastTick = currentTime;
+		this.lastTimestep = timestep;
+		return timestep;
+	}
+	
+	// The function that simulates movement on the physical object.
+	//
+	// Should be called by the parent every game tick.
+	PhysicalBitmap.prototype.tick = function(event) {		
+		var timestep = this.performTimestep();
 
 		// Run a Verlet second-order integration. This is better
 		// than the simpler Euler integration, assuming a constant
