@@ -52,6 +52,8 @@
 		this.currentPosition = new Vector2D(x, y);
 		this.lastAppliedAcceleration = new Vector2D(0, 0);
 		this.anchorPoint = new Vector2D(0, 0);
+
+		this.setPosition(x, y);
 		
 		// Set up the image.
 		var image = tfn.preloader.getResult(imageName);
