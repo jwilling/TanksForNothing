@@ -21,7 +21,10 @@ tfn.PreloadingScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		
 		// Move to the next screen when preloading is done.
 		preloader.addEventListener("complete", function() {
-			game.setScreenState(STATE_SPLASH);
+			//game.setScreenState(STATE_SPLASH);
+			
+			// TEMP:
+			game.setScreenState(STATE_GAME);
 		});
 		
 		// Start the preloader.
