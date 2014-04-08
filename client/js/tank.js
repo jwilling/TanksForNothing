@@ -7,24 +7,38 @@ tfn.Tank = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 		
 		baseConstructor.call(this, imageName, x, y, maximumVelocity, frictionCoefficient, accelerationMagnitude);
 		
+		this.tankVelocity = 250;
 		this.setAnchorPoint(0.5, 0.5);
 	}
 	
-	this.accelerate = function(shouldAccelerate) {
+	this.moveForward = function() {
+		this.move(this.tankVelocity);
+	}
+	
+	this.moveBackward = function() {
+		this.move(-this.tankVelocity);
+	}
+	
+	this.stop = function() {
+		this.move(0);
+	}
+	
+	this.move = function(velocity) {
 		// Just apply a constant velocity relative to the timestep.
-		var velocity = (shouldAccelerate ? 200 : 0);
-		var timestep = this.performTimestep();
-
 		var radians = this.rotation * (Math.PI / 180);
+		var timestep = this.lastTimestep;
+		
 		var x = this.currentPosition.x + velocity * Math.cos(radians) * timestep;
 		var y = this.currentPosition.y + velocity * Math.sin(radians) * timestep;
 		
 		this.setPosition(x, y);
 	}
 
-	this.tick = function() {
+	this.tick = function() {		
 		// We don't want to inherit any simulations from
-		// the parent, so override this and keep it empty.
+		// the parent, so override this and keep it empty
+		// except for the timestep calculation.
+		this.performTimestep();
 	}
 	
 	this.rotateRight = function() {
@@ -33,5 +47,17 @@ tfn.Tank = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 	
 	this.rotateLeft = function() {
 		this.rotation -= this.lastTimestep * 200;
+	}
+	
+	this.setCollisions = function(collisions) {
+		if (collisions.COLLISION) {
+			// Reset our rotation and position back to the 
+			// last known safe values.
+			this.rotation = this.lastKnownSafeRotation;
+			this.setPosition(this.lastKnownSafePosition.x, this.lastKnownSafePosition.y);
+		} else {
+			this.lastKnownSafePosition = this.currentPosition;
+			this.lastKnownSafeRotation = this.rotation;
+		}
 	}
 });
