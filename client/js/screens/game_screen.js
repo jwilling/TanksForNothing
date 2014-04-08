@@ -55,7 +55,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.tank.rotateRight();
 		}
 		
-		var collisionDetector = new tfn.CollisionDetector(this.tank, this.mapBitmap, "map");
+		var collisionDetector = new tfn.CollisionDetector(this.tank.getCollisionRect(), this.mapBitmap, "map");
 		this.tank.setCollisions(collisionDetector.collisions);
 		
 		// Send a tick event to all of the physical objects we're
