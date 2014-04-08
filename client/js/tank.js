@@ -29,7 +29,7 @@
 	Tank.prototype.initializeTurret = function() {
 		var turretImage = tfn.preloader.getResult("tank-turret-red");
 		this.turret = new createjs.Bitmap(turretImage);
-		this.turret.regX = 0.1 * turretImage.width;
+		this.turret.regX = 0.22 * turretImage.width;
 		this.turret.regY = 0.5 * turretImage.height;
 		
 		this.addChild(this.turret);
