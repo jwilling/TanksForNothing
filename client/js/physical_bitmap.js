@@ -13,27 +13,13 @@
 		this.initialize(imageName, x, y);
 		
 		this.friction = friction || 0;
-		this.maximumVelocity = new Vector2D(maximumVelocity, maximumVelocity);
+		this.maximumVelocity = new tfn.Vector2D(maximumVelocity, maximumVelocity);
 		this.accelerationMagnitude = accelerationMagnitude;
 	}
 	
 	var prototype = new createjs.Bitmap();
 	PhysicalBitmap.prototype = prototype;
 	PhysicalBitmap.prototype.bitmap_initialize = prototype.initialize;	
-	
-	// An object that stores a 2D vector.
-	function Vector2D(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-	
-	// An object that stores values composed to make a rect.
-	function Rect(x, y, width, height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
 	
 	// Utility function to clamp a numerical value between
 	// an upper and lower bounds.
@@ -47,11 +33,11 @@
 		
 		// Set up our initial (internal) values.
 		this.lastTick = -Infinity;
-		this.acceleration = new Vector2D(0, 0);
-		this.currentVelocity = new Vector2D(0, 0);
-		this.currentPosition = new Vector2D(x, y);
-		this.lastAppliedAcceleration = new Vector2D(0, 0);
-		this.anchorPoint = new Vector2D(0, 0);
+		this.acceleration = new tfn.Vector2D(0, 0);
+		this.currentVelocity = new tfn.Vector2D(0, 0);
+		this.currentPosition = new tfn.Vector2D(x, y);
+		this.lastAppliedAcceleration = new tfn.Vector2D(0, 0);
+		this.anchorPoint = new tfn.Vector2D(0, 0);
 
 		this.setPosition(x, y);
 		
@@ -64,29 +50,14 @@
 	
 	// Sets a new acceleration on the object.
 	PhysicalBitmap.prototype.setAcceleration = function(accelerationX, accelerationY) {
-		this.acceleration = new Vector2D(accelerationX, accelerationY);
-	}
-	
-	// Updates the last tick and returns the current timestep.
-	PhysicalBitmap.prototype.performTimestep = function() {
-		// Make sure we have a valid initial tick time.
-		if (this.lastTick < 0) {
-			this.lastTick = createjs.Ticker.getTime();
-		}
-		
-		// Calculate the delta since the last tick.
-		var currentTime = createjs.Ticker.getTime();
-		var timestep = (currentTime - this.lastTick) / 1000;
-		this.lastTick = currentTime;
-		this.lastTimestep = timestep;
-		return timestep;
+		this.acceleration = new tfn.Vector2D(accelerationX, accelerationY);
 	}
 	
 	// The function that simulates movement on the physical object.
 	//
 	// Should be called by the parent every game tick.
 	PhysicalBitmap.prototype.tick = function(event) {		
-		var timestep = this.performTimestep();
+		var timestep = tfn.lastTimestep;
 
 		// Run a Verlet second-order integration. This is better
 		// than the simpler Euler integration, assuming a constant
@@ -96,7 +67,7 @@
 		//
 		// First we calculate the acceleration. This will have a frictional
 		// force applied to it.
-		var acceleration = new Vector2D(this.acceleration.x, this.acceleration.y);
+		var acceleration = new tfn.Vector2D(this.acceleration.x, this.acceleration.y);
 		
 		// var radians = this.rotation * (Math.PI / 180);
 		// var accelerationModifierX = (this.currentVelocity.x >= 0 ? 1 : -1);
@@ -139,7 +110,7 @@
 		var positionY = this.currentPosition.y + (oldVelocity.y + velocityY) * 0.5 * timestep;
 		
 		// Update the stored velocity.
-		this.currentVelocity = new Vector2D(velocityX, velocityY);
+		this.currentVelocity = new tfn.Vector2D(velocityX, velocityY);
 		
 		// Update the position.
 		this.setPosition(positionX, positionY);
@@ -163,17 +134,17 @@
 	//
 	// Requires an update of the stage to draw the changes.
 	PhysicalBitmap.prototype.setPosition = function(x, y) {
-		this.currentPosition = new Vector2D(x, y);
+		this.currentPosition = new tfn.Vector2D(x, y);
 		this.x = x;
 		this.y = y;
 	}
 	
 	PhysicalBitmap.prototype.setCollisionRect = function(x, y, width, height) {
-		this.collisionRect = new Rect(x, y, width, height);
+		this.collisionRect = new tfn.Rect(x, y, width, height);
 	}
 	
 	PhysicalBitmap.prototype.getCollisionRect = function() {
-		return this.collisionRect || new Rect(0, 0, this.image.width, this.image.height);
+		return this.collisionRect || new tfn.Rect(0, 0, this.image.width, this.image.height);
 	}
 	
 	PhysicalBitmap.prototype.setCollisions = function(collisions) {
@@ -200,7 +171,7 @@
 	//
 	// The default anchor point is 0, 0.
 	PhysicalBitmap.prototype.setAnchorPoint = function(x, y) {
-		this.anchorPoint = new Vector2D(x, y);
+		this.anchorPoint = new tfn.Vector2D(x, y);
 		this.regX = x * this.image.width;
 		this.regY = y * this.image.height;
 	}
