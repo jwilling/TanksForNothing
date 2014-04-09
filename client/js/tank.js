@@ -9,6 +9,11 @@
 	Tank.prototype.initialize = function(x, y) {
 		this.container_initialize();
 				
+		// Define empty callback functions that the parent can
+		// override to get state change callbacks.
+		this.stateChangedHandler = function(x, y, tankRotation, turretRotation) {};
+		this.shouldFireHandler = function(startingX, startingY, angle) {};
+				
 		this.rotationalVelocity = 200;
 		this.initializeTank();
 		this.initializeTurret();
@@ -63,7 +68,9 @@
 		this.tankBody.y = y;
 		this.turret.x = x;
 		this.turret.y = y;
+		
 		this.currentPosition = new tfn.Vector2D(x, y);
+		this.stateChangedHandler(x, y, this.tankBody.rotation, this.turret.rotation);
 	}
 
 	Tank.prototype.getCollisionRect = function() {
@@ -77,20 +84,25 @@
 		);
 	}
 	
-	Tank.prototype.rotateRight = function() {
-		this.tankBody.rotation += tfn.lastTimestep * this.rotationalVelocity;
+	Tank.prototype.rotateLeft = function() {
+		this.rotateChild(this.tankBody, -tfn.lastTimestep * this.rotationalVelocity);
 	}
 	
-	Tank.prototype.rotateLeft = function() {
-		this.tankBody.rotation -= tfn.lastTimestep * this.rotationalVelocity;
+	Tank.prototype.rotateRight = function() {
+		this.rotateChild(this.tankBody, tfn.lastTimestep * this.rotationalVelocity);
 	}
 	
 	Tank.prototype.rotateTurretLeft = function() {
-		this.turret.rotation -= tfn.lastTimestep * this.rotationalVelocity;
+		this.rotateChild(this.turret, -tfn.lastTimestep * this.rotationalVelocity);
 	}
 	
 	Tank.prototype.rotateTurretRight = function() {
-		this.turret.rotation += tfn.lastTimestep * this.rotationalVelocity;
+		this.rotateChild(this.turret, tfn.lastTimestep * this.rotationalVelocity);
+	}
+	
+	Tank.prototype.rotateChild = function(child, amount) {
+		child.rotation += amount;
+		this.stateChangedHandler(this.tankBody.x, this.tankBody.y, this.tankBody.rotation, this.turret.rotation);
 	}
 	
 	Tank.prototype.setCollisions = function(collisions) {	
