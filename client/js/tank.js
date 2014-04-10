@@ -133,8 +133,16 @@
 	Tank.prototype.setCollisions = function(collisions) {	
 		if (collisions.LEFT || collisions.RIGHT) {
 			this.setPosition(this.lastKnownSafePosition.x, this.currentPosition.y);
+			
+			if (!collisions.TOP && !collisions.BOTTOM) {
+				this.lastKnownSafePosition.y = this.currentPosition.y;
+			}
 		} else if (collisions.TOP || collisions.BOTTOM) {
 			this.setPosition(this.currentPosition.x, this.lastKnownSafePosition.y);
+			
+			if (!collisions.RIGHT && !collisions.LEFT) {
+				this.lastKnownSafePosition.x = this.currentPosition.x;
+			}
 		}
 		
 		if (!collisions.COLLISION) {
