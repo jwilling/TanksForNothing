@@ -9,6 +9,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Add the map image.
 		this.mapBitmap = this.addImage("map-blue", 0, 0);
 		
+		this.playerColorMappings = {
+			0: "red",
+			1: "green",
+			2: "orange",
+			3: "yellow",
+		};
+		
 		// Create the tanks.
 		this.createTanks();
 		
@@ -18,6 +25,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Set up a ticker to redraw on the tick interval.
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
+	
 	this.createTanks = function() {
 		// Create a mapping from player IDs to tank sprites.
 		//this.playerIDToTankMappings = {};
@@ -25,12 +33,15 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Iterate over the players
 		for (var key in gameEnv.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;
-			console.log(gameEnv);
+
 			var player = gameEnv.players[key];
 			
 			// Create a new tank, associate it with the player, and
 			// add it as a child.
-			var tank = new tfn.Tank(player.locX, player.locY);
+			console.log("player number: " + player.playerNum);
+			
+			var colorName = this.playerColorMappings[player.playerNum];
+			var tank = new tfn.Tank(player.locX, player.locY, colorName, player.playerNum);
 			playerIDToTankMappings[player.playerID] = tank;
 			this.addChild(tank);
 		}
@@ -45,8 +56,9 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 		
 		var me = this;
-		this.tank.shouldFireHandler = function(startingX, startingY, angle) {
-			var bullet = new tfn.Bullet(startingX, startingY, angle);
+		this.tank.shouldFireHandler = function(startingX, startingY, angle, playerNumber) {
+			var colorName = me.playerColorMappings[playerNumber];
+			var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
 			me.addChild(bullet);
 		}
 		

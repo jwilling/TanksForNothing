@@ -1,9 +1,9 @@
 tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
-	this.constructor = function(x, y, angle) {
+	this.constructor = function(x, y, angle, colorName, playerID) {
 		var velocity = 200;
 		var timeToLive = 2000; // ms
-		
-		baseConstructor.call(this, "tank-bullet-red", x, y, velocity);
+
+		baseConstructor.call(this, "tank-bullet-" + colorName, x, y, velocity);
 		
 		var radians = angle * (Math.PI / 180);
 		var velocityX = velocity * Math.cos(radians);
@@ -11,6 +11,7 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 
 		this.currentVelocity = new tfn.Vector2D(velocityX, velocityY);
 		this.setAnchorPoint(0.5, 0.5);
+		this.ownerPlayerID = playerID;
 		
 		setTimeout(this.kill.bind(this), timeToLive);
 	}

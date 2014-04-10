@@ -1,13 +1,17 @@
 (function() {
-	var Tank = function(x, y) {
-		this.initialize(x, y);
+	var Tank = function(x, y, colorName, playerNumber) {
+		this.initialize(x, y, colorName, playerNumber);
 	}
 	var prototype = new createjs.Container();
 	Tank.prototype = prototype;
 	Tank.prototype.container_initialize = prototype.initialize;
 	
-	Tank.prototype.initialize = function(x, y) {
+	Tank.prototype.initialize = function(x, y, colorName, playerNumber) {
+		console.log(colorName);
 		this.container_initialize();
+		
+		this.colorName = colorName;
+		this.playerNumber = playerNumber;
 				
 		// Define empty callback functions that the parent can
 		// override to get state change callbacks.
@@ -21,8 +25,8 @@
 		this.setPosition(x, y);
 	}
 	
-	Tank.prototype.initializeTank = function() {
-		var tankImage = tfn.preloader.getResult("tank-body-red");
+	Tank.prototype.initializeTank = function() {			
+		var tankImage = tfn.preloader.getResult("tank-body-" + this.colorName);
 		this.tankBody = new createjs.Bitmap(tankImage);
 		this.tankBody.regX = 0.5 * tankImage.width;
 		this.tankBody.regY = 0.5 * tankImage.height;
@@ -33,7 +37,7 @@
 	}
 	
 	Tank.prototype.initializeTurret = function() {
-		var turretImage = tfn.preloader.getResult("tank-turret-red");
+		var turretImage = tfn.preloader.getResult("tank-turret-" + this.colorName);
 		this.turret = new createjs.Bitmap(turretImage);
 		this.turret.regX = 0.22 * turretImage.width;
 		this.turret.regY = 0.5 * turretImage.height;
@@ -127,7 +131,7 @@
 		var startingY = this.turret.y + this.turret.image.width * Math.sin(rotationRadians);
 		
 		this.lastPlayerShot = Date.now();
-		this.shouldFireHandler(startingX, startingY, this.turret.rotation);
+		this.shouldFireHandler(startingX, startingY, this.turret.rotation, this.playerNumber);
 	}
 	
 	Tank.prototype.setCollisions = function(collisions) {	
