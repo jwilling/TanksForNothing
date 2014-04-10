@@ -101,6 +101,16 @@
 		this.rotateChild(this.turret, tfn.lastTimestep * this.rotationalVelocity);
 	}
 	
+	// Sets the tank rotation without emitting an update.
+	Tank.prototype.setTankRotation = function(rotation) {
+		this.tankBody.rotation = rotation;
+	}
+	
+	// Sets the turret rotation without emitting an update.
+	Tank.prototype.setTurretRotation = function(rotation) {
+		this.turret.rotation = rotation;
+	}
+	
 	Tank.prototype.rotateChild = function(child, amount) {
 		child.rotation += amount;
 		this.stateChangedHandler(this.tankBody.x, this.tankBody.y, this.tankBody.rotation, this.turret.rotation);
