@@ -1,3 +1,4 @@
+lastPlayerShot = Date.now(); //shouldn't be global
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function() {
 		baseConstructor.call(this);
@@ -17,7 +18,6 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Set up a ticker to redraw on the tick interval.
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
-	
 	this.createTanks = function() {
 		this.tank = new tfn.Tank(90, 90);
 
@@ -29,9 +29,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		
 		var me = this;
 		this.tank.shouldFireHandler = function(startingX, startingY, angle) {
-			var bullet = new tfn.Bullet(startingX, startingY, angle);
-			
-			me.addChild(bullet);
+			if(Date.now() - lastPlayerShot > 500){
+				lastPlayerShot = Date.now();
+				startingX = startingX - 10 + 4aw0*Math.cos(angle*Math.PI/180);
+				startingY = startingY - 10 + 40*Math.sin(angle*Math.PI/180);
+				var bullet = new tfn.Bullet(startingX, startingY, angle);
+				me.addChild(bullet);
+			}
 		}
 	}
 	
