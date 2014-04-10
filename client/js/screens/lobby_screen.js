@@ -18,12 +18,19 @@ tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		if (isHost) {
 			this.addButton("menu-button-start-game", 552, 670, function() {
 				// Go to the countdown screen.
-				//
-				// TODO: server stuff.
+				clientStartHostedGame();
+
+
 				game.setScreenState(STATE_COUNTDOWN);
 			});
 		} else {
 			this.addButton("menu-label-waiting", 552, 685, function(){});
+			
+			//wait for host to start game
+			clientWaitForStartGame(function (data) {
+				removeStartGameCallback();
+				game.setScreenState(STATE_COUNTDOWN)
+			});
 		}
 		
 		console.log("Are we host? " + isHost);

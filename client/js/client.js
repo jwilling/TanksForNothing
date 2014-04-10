@@ -7,6 +7,37 @@ var session = null;
 var gameEnv;
 
 var gameEnvUpdateCallback = function(data){};
+var sessionUpdateCallback = function(data){};
+var startGameCallback = function(data){};
+
+
+//Function that client calls to being hosting game.
+function clientHostGame(callback){
+	sessionUpdateCallback = callback;
+	socket.emit("host_game", {});
+}
+//Client uses this to join an open game. 
+function clientJoinGame(callback){
+	sessionUpdateCallback = callback;
+	socket.emit("join_game", {});
+}
+function clientStartHostedGame(){
+	socket.emit("start_game", {});
+}
+function clientWaitForStartGame(callback){
+	startGameCallback = callback;
+}
+
+//Returns session update callback a function with no global effect.
+function removeSessionUpdateCallback(){
+	sessionUpdateCallback = new function(data){};
+}
+
+function removeStartGameCallback(){
+	removeStartGameCallback = new function(data){};
+}
+
+
 
 //Update Server Game Env
 function updatePlayerOnServer(){
@@ -22,9 +53,7 @@ function updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection){
 		bodyDirection: bodyDirection, turretDirection: turretDirection});
 }
 
-function joinGame(){
-	socket.emit("join_game", {});
-}
+
 
 //Player Object Constructor
 function Player(playerID){
@@ -94,8 +123,11 @@ var setEventHandlers = function() {
 		client.on("playerDeath", function(data){
 			onServerUpdateGameEnv(client, data);
 		});	
+		client.on("start_game", function(data){
+			onServerStartGame(client, data);
+		});
 		client.emit("request_playerID",{});
-		client.emit("join_game", {});
+		//client.emit("join_game", {});
 		//client.on("player_left_game", function(data){
 		//	onServerUpdateGameEnv(client, data);
 		//});
@@ -106,6 +138,7 @@ var setEventHandlers = function() {
 function onServerUpdateGameEnv(client, data){
 	GameIsInSession = true;
 	gameEnv = data;
+	//console.log(JSON.stringify(data));
 	gameEnvUpdateCallback(gameEnv);
 }
 
@@ -116,18 +149,27 @@ function onServerUpdatePlayerID(client, data){
 }
 
 function onServerUpdateGameSession(client, data){
-	console.log(JSON.stringify(data.gameEnv));
 	session = data;	
 	gameEnv = data.gameEnv;
-	console.log(session);
+	sessionUpdateCallback(data);
+	//console.log(session);
 }
 
-var GameIsInSession = false;
-window.setInterval(function(){
-	if(GameIsInSession){ //client/js/play.js
-		console.log("Requesting Game Env");
-		requestGameEnv();
-	}
-}, 5000);
+function onServerStartGame(client, data){
+	console.log("Client recieved start game.");
+	gameEnv = data;
+	session.gameEnv = data;
+	startGameCallback();
+	
+}
+
+
+//var GameIsInSession = false;
+//window.setInterval(function(){
+//	if(GameIsInSession){ //client/js/play.js
+		//console.log("Requesting Game Env");
+//		requestGameEnv();
+//	}
+//}, 50);
 
 initSocket();
