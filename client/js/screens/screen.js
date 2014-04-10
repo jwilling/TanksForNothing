@@ -38,6 +38,16 @@
 		return bitmap;
 	}
 	
+	// A convenience function for adding a label to the screen.
+	Screen.prototype.addLabel = function(text, font, color, x, y) {
+		var label = new createjs.Text(text, font, color);
+		label.x = x;
+		label.y = y;
+
+		this.addChild(label);
+		return label;
+	}
+	
 	// A convience function for setting up a button with a click handler.
 	Screen.prototype.addButton = function(imageName, x, y, clickHandler) {
 		this.addImage(imageName, x, y).on("click", clickHandler);
@@ -47,6 +57,11 @@
 	// screen object is created.
 	Screen.prototype.initialize = function() {
 		this.container_initialize();
+		
+		// Our bounds will always be the same size as the canvas,
+		// so we can save some calculations by pre-calculating the
+		// bounds.
+		this.setBounds(0, 0, game.stage.canvas.width, game.stage.canvas.height);
 		
 		// Initialize the mixins so subclasses can inherit from us.
 		Function.initMixins(this);
