@@ -143,8 +143,16 @@
 		this.collisionRect = new tfn.Rect(x, y, width, height);
 	}
 	
+	
 	PhysicalBitmap.prototype.getCollisionRect = function() {
-		return this.collisionRect || new tfn.Rect(0, 0, this.image.width, this.image.height);
+		return this.collisionRect || new tfn.Rect(
+			this.currentPosition.x, 
+			this.currentPosition.y, 
+			this.image.width, 
+			this.image.height, 
+			this.rotation, 
+			this.anchorPoint
+		);
 	}
 	
 	PhysicalBitmap.prototype.setCollisions = function(collisions) {
@@ -156,9 +164,11 @@
 		}
 		if (collisions.TOP) {
 			this.currentVelocity.y *= -1;
+			this.currentVelocity.x *= -1;
 		}
 		if (collisions.BOTTOM) {
 			this.currentVelocity.y *= -1;
+			this.currentVelocity.x *= -1;
 		}
 	}
 	
