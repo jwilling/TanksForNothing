@@ -274,7 +274,8 @@ function onClientJoinGame(client, data){
 			players[client.id] = new Player(client.id);
 			players[client.id].sessionID = session_id;
 			var playerNum = 0;
-			for(id in gameEnv.players){ playerNum = playerNum + 1; }
+			for(var id in gameEnv.players){ playerNum = playerNum + 1; }
+			
 			players[client.id].playerNum = playerNum;
 			gameEnv.addPlayer(client.id);
 			session.gamEnv = gameEnv;
