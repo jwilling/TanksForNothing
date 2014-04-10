@@ -18,12 +18,29 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
 	this.createTanks = function() {
-		this.tank = new tfn.Tank(90, 90);
-
-		this.addChild(this.tank);
+		// Create a mapping from player IDs to tank sprites.
+		this.playerIDToTankMappings = {};
 		
-		this.tank.stateChangedHandler = function(x, y, tankRotation, turretRotation) {
+		// Iterate over the players
+		for (var key in gameEnv.players) {
+			if (!gameEnv.players.hasOwnProperty(key)) continue;
 			
+			var player = gameEnv.players[key];
+			
+			// Create a new tank, associate it with the player, and
+			// add it as a child.
+			var tank = new tfn.Tank(player.locX, player.locY);
+			this.playerIDToTankMappings[player.playerID] = tank;
+			this.addChild(tank);
+		}
+		
+		// Keep a reference to our own tank.
+		this.tank = this.playerIDToTankMappings[myPlayerID];
+		
+		// Keep track of when our tank state changes, and emit
+		// this to the server so it can update the game environment.
+		this.tank.stateChangedHandler = function(x, y, tankRotation, turretRotation) {
+			updatePlayerPositionOnServer(x, y, tankRotation, turretRotation);
 		}
 		
 		var me = this;
@@ -31,6 +48,8 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			var bullet = new tfn.Bullet(startingX, startingY, angle);
 			me.addChild(bullet);
 		}
+		
+		gameEnvUpdateCallback = this.updateGameEnvironment;
 	}
 	
 	this.createHUD = function() {
@@ -107,5 +126,23 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 
 		game.stage.update();
+	}
+	
+	this.updateGameEnvironment = function(env) {
+		console.log("updating env");
+		// Iterate over the players
+		for (var key in env.players) {
+			if (!gameEnv.players.hasOwnProperty(key)) continue;
+			
+			var player = gameEnv.players[key];
+			
+			// We don't want to update our own position from the server.
+			if (player.playerID == myPlayerID) continue;
+			
+			var tank = this.playerIDToTankMappings[player.playerID];
+			tank.setPosition(player.locX, player.locY);
+			tank.setTankRotation(player.bodyDirection);
+			tank.setTurretRotation(player.turretDirection);
+		}
 	}
 });
