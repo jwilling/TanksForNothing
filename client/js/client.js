@@ -75,7 +75,7 @@ function Session(sessionOwner, settings){
 var client = null;
 
 function initSocket(){
-	socket = io.connect("54.186.46.19:50505");
+	socket = io.connect("127.0.0.1:50505");
 	client = socket;
 	setEventHandlers();
 }
