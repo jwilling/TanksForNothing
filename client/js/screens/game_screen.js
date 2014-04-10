@@ -14,12 +14,6 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		//Health Bar
 		this.createHUD();
 		
-		this.healthBarChildIndex;
-		this.player1ScoreChildIndex;
-		this.player2ScoreChildIndex;
-		this.player3ScoreChildIndex;
-		this.player4ScoreChildIndex;
-			
 		// Set up a ticker to redraw on the tick interval.
 		createjs.Ticker.addEventListener("tick", this.tick.bind(this));
 	}
@@ -33,6 +27,14 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		
 		for (var i = 0; i < this.physicalObjects.length; i++) {
 			this.addChild(this.physicalObjects[i]);
+		}
+		
+		this.tank.stateChangedHandler = function(x, y, tankRotation, turretRotation) {
+
+		}
+		
+		this.tank.shouldFireHandler = function(startingX, startingY, angle) {
+			console.log("should fire at rotation: " + angle);
 		}
 	}
 	
@@ -66,9 +68,6 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		
 		//Add it
 		this.addChild(bar);
-		
-		//Save New Index
-		this.healthBarChildIndex = this.getChildIndex(bar);
 	}
 	
 	this.updatePlayerScores = function(player1Score, player2Score, player3Score, player4Score) {
@@ -78,10 +77,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		this.player4ScoreLabel.text = player4Score.toString();
 	}
 	
-	
 	this.tick = function() {
-		//this.tank.stop();
-		
 		if (game.isKeyPressed(KEY_W)) {
 			this.tank.moveForward();
 		}
@@ -100,6 +96,9 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		if (game.isKeyPressed(KEY_RIGHT)) {
 			this.tank.rotateTurretRight();
 		}
+		if (game.isKeyPressed(KEY_SPACE)) {
+			this.tank.fire();
+		}
 		
 		var collisionDetector = new tfn.CollisionDetector(this.tank.getCollisionRect(), this.mapBitmap, "map");
 		this.tank.setCollisions(collisionDetector.collisions);
@@ -110,7 +109,6 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.physicalObjects[i].tick(event);
 		}
 		
-		
-		game.stage.update(event);
+		game.stage.update();
 	}
 });

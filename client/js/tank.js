@@ -105,6 +105,14 @@
 		this.stateChangedHandler(this.tankBody.x, this.tankBody.y, this.tankBody.rotation, this.turret.rotation);
 	}
 	
+	Tank.prototype.fire = function() {
+		// TODO: get correct starting x and y
+		//
+		// TODO: this will get fired 60 times per second, we need
+		// to implement the cooldown!
+		this.shouldFireHandler(this.turret.x, this.turret.y, this.turret.rotation);
+	}
+	
 	Tank.prototype.setCollisions = function(collisions) {	
 		
 		if (collisions.LEFT || collisions.RIGHT) {
