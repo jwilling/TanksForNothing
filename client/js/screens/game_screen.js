@@ -130,12 +130,11 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	var me = this;
 	this.updateGameEnvironment = function(env) {
-		console.log("updating env");
 		// Iterate over the players
 		for (var key in env.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;	
 			var player = gameEnv.players[key];
-			console.log(env.players[key]);
+
 			// We don't want to update our own position from the server.
 			if (player.playerID == myPlayerID) continue;
 			var tank = playerIDToTankMappings[player.playerID];
