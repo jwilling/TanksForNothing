@@ -131,7 +131,6 @@
 	}
 	
 	Tank.prototype.setCollisions = function(collisions) {	
-		
 		if (collisions.LEFT || collisions.RIGHT) {
 			this.setPosition(this.lastKnownSafePosition.x, this.currentPosition.y);
 		} else if (collisions.TOP || collisions.BOTTOM) {

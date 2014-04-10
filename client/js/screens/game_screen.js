@@ -1,3 +1,4 @@
+playerIDToTankMappings = {}
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function() {
 		baseConstructor.call(this);
@@ -19,23 +20,23 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	this.createTanks = function() {
 		// Create a mapping from player IDs to tank sprites.
-		this.playerIDToTankMappings = {};
+		//this.playerIDToTankMappings = {};
 		
 		// Iterate over the players
 		for (var key in gameEnv.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;
-			
+			console.log(gameEnv);
 			var player = gameEnv.players[key];
 			
 			// Create a new tank, associate it with the player, and
 			// add it as a child.
 			var tank = new tfn.Tank(player.locX, player.locY);
-			this.playerIDToTankMappings[player.playerID] = tank;
+			playerIDToTankMappings[player.playerID] = tank;
 			this.addChild(tank);
 		}
 		
 		// Keep a reference to our own tank.
-		this.tank = this.playerIDToTankMappings[myPlayerID];
+		this.tank = playerIDToTankMappings[myPlayerID];
 		
 		// Keep track of when our tank state changes, and emit
 		// this to the server so it can update the game environment.
@@ -127,19 +128,17 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 
 		game.stage.update();
 	}
-	
+	var me = this;
 	this.updateGameEnvironment = function(env) {
 		console.log("updating env");
 		// Iterate over the players
 		for (var key in env.players) {
-			if (!gameEnv.players.hasOwnProperty(key)) continue;
-			
+			if (!gameEnv.players.hasOwnProperty(key)) continue;	
 			var player = gameEnv.players[key];
-			
+			console.log(env.players[key]);
 			// We don't want to update our own position from the server.
 			if (player.playerID == myPlayerID) continue;
-			
-			var tank = this.playerIDToTankMappings[player.playerID];
+			var tank = playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);

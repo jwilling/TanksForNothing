@@ -45,6 +45,7 @@ function updatePlayerOnServer(){
 }
 
 function requestGameEnv(){
+	//("requesting game env");
 	socket.emit("request_game_env", {});
 }
 
@@ -138,7 +139,7 @@ var setEventHandlers = function() {
 function onServerUpdateGameEnv(client, data){
 	GameIsInSession = true;
 	gameEnv = data;
-	//console.log(JSON.stringify(data));
+	//console.log("game Env Recieved");
 	gameEnvUpdateCallback(gameEnv);
 }
 

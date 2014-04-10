@@ -30,8 +30,8 @@ function makeid()
 
 function Player(playerID){
 	this.playerID = playerID;
-	this.locX = 0;
-	this.locY = 0;
+	this.locX = 90;
+	this.locY = 90;
 	this.bodyDirection = 0;
 	this.turretDirection = 0;
 	this.HP = 100;
@@ -181,6 +181,7 @@ var setEventHandlers = function() {
 
 
 function onClientUpdatePlayer(client, data){
+	console.log("updating Player");
 	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
@@ -195,12 +196,13 @@ function updateGameEnvironmentsForSession(sessionID){
 	var session = sessions[sessionID];
 	var now = new Date();
 	var timeSinceLastEmit = now - session.lastEmit;
-	if (timeSinceLastEmit > 17) {
+	//if (timeSinceLastEmit > 17) {
+		//console.log("emitting game");
 		session.lastEmit = now;
 		for (clientID in sessions[sessionID].gameEnv.players) {
-			socket.sockets.socket(clientID).emit("update_game_env", sessions[sessionID].gameEnv);
+			clients[clientID].emit("update_game_env", sessions[sessionID].gameEnv);
 		}
-	}
+	//}
 }
 
 function onClientStartGame(client, data){
@@ -279,7 +281,7 @@ function onClientJoinGame(client, data){
 				session.setState = sessionStates["waitingStart"];
 			} 
 			for(clientID in session.gameEnv.players){
-				socket.sockets.socket(clientID).emit("update_game_env", session.gameEnv);
+				clients[clientID].emit("update_game_env", session.gameEnv);
 			}
 			client.emit("update_game_session", session);
 		}
