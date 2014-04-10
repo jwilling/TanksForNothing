@@ -30,6 +30,7 @@ function makeid()
 
 function Player(playerID){
 	this.playerID = playerID;
+	this.playerNum = 0;
 	this.locX = 90;
 	this.locY = 90;
 	this.bodyDirection = 0;
@@ -239,6 +240,7 @@ function onClientHostGame(client, data){
 	sessions[newSession.sessionID] = newSession;
 	ses = newSession;
 	players[client.id] = new Player(client.id);
+	players[client.id].playerNum = 0;
 	players[client.id].sessionID = ses.sessionID;
 	newSession.gameEnv.players[client.id] = players[client.id];
 	newSession.sessionOwner = client.id
@@ -271,6 +273,7 @@ function onClientJoinGame(client, data){
 			var gameEnv = session.gameEnv;
 			players[client.id] = new Player(client.id);
 			players[client.id].sessionID = session_id;
+			players[client.id].playerNum = gameEnv.players.length + 1;
 			gameEnv.addPlayer(client.id);
 			session.gamEnv = gameEnv;
 			var player_count = 0;
