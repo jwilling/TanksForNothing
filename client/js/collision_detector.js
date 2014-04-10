@@ -5,25 +5,25 @@
 		this.y = y || 0;
 	}
 	
-	// Perform a collision test with the specified physical sprite, bounding map
+	// Perform a collision test with the specified Rect, bounding map,
 	// and identifier. The identifier should be unique between bounding maps, as
 	// the map itself is cached internally.
-	var CollisionDetector = function(physicalSprite, boundingMap, identifier) {
+	var CollisionDetector = function(rect, boundingMap, identifier) {
 		// Store the identifier and bitmap.
 		this.identifier = identifier;
 		this.bitmap = boundingMap;
 		
-		// Get the collision rect from the object.
-		var rect = this.getCollisionRect(physicalSprite);
-
 		// Get the relative anchor point from the object.
 		//
 		// This will be transposted into a global point later. 
-		var relativeAnchorPoint = new Point(physicalSprite.regX, physicalSprite.regY);
+		var relativeAnchorPoint = new Point(rect.anchorPoint.x * rect.width, rect.anchorPoint.y * rect.height);
+		
+		// Get the collision rect from the object.
+		var collisionRect = this.getCollisionRect(rect, relativeAnchorPoint);
 		
 		// Calculate the rotated rect derived from individual rotation
 		// of the four points.
-		var rotatedRect = this.createRotatedRect(rect, relativeAnchorPoint, physicalSprite.rotation);
+		var rotatedRect = this.createRotatedRect(collisionRect, relativeAnchorPoint, rect.rotation);
 
 		// Finally actually check for collisions.
 		this.calculateCollisions(rotatedRect);
@@ -58,25 +58,25 @@
 		this.p4 = p4 || new Point();
 	}
 	
-	CollisionDetector.prototype.getCollisionRect = function(physicalSprite) {
+	CollisionDetector.prototype.getCollisionRect = function(collisionRect, relativeAnchorPoint) {
 		var rect = new Rectangle();
-				
+						
 		// We have to get the four exact corners of the object.		
-		rect.p1 = new Point(physicalSprite.x, physicalSprite.y);
-		
+		rect.p1 = new Point(collisionRect.x, collisionRect.y);
+			
 		// This means that for objects that have an anchor point
 		// which isn't (0, 0) we need to transpose it back to the 
 		// on-screen position.
-		rect.p1.x -= physicalSprite.regX;
-		rect.p1.y -= physicalSprite.regY;
+		rect.p1.x -= relativeAnchorPoint.x;
+		rect.p1.y -= relativeAnchorPoint.y;
 		
 		rect.p2 = rect.p1.clone();
 		rect.p3 = rect.p1.clone();
 		rect.p4 = rect.p1.clone();
 		
-		rect.p2.x += physicalSprite.getCollisionRect().width;
+		rect.p2.x += collisionRect.width;
 		rect.p3.x = rect.p2.x;
-		rect.p3.y += physicalSprite.getCollisionRect().height;
+		rect.p3.y += collisionRect.height;
 		rect.p4.y = rect.p3.y;
 		
 		return rect;
