@@ -18,17 +18,6 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 		this.parent.removeChild(this);
 	}
 	
-	this.getCollisionRect = function() {
-		return new tfn.Rect(
-			this.currentPosition.x, 
-			this.currentPosition.y, 
-			this.image.width, 
-			this.image.height, 
-			this.rotation, 
-			this.anchorPoint
-		);
-	}
-	
 	this.tick = function() {
 		base.tick.call(this);
 		
