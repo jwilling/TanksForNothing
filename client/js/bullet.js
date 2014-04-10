@@ -8,7 +8,9 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 		var radians = angle * (Math.PI / 180);
 		var velocityX = velocity * Math.cos(radians);
 		var velocityY = velocity * Math.sin(radians);
+
 		this.currentVelocity = new tfn.Vector2D(velocityX, velocityY);
+		this.setAnchorPoint(0.5, 0.5);
 		
 		setTimeout(this.kill.bind(this), timeToLive);
 	}

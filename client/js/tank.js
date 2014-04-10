@@ -13,6 +13,7 @@
 		// override to get state change callbacks.
 		this.stateChangedHandler = function(x, y, tankRotation, turretRotation) {};
 		this.shouldFireHandler = function(startingX, startingY, angle) {};
+		this.lastPlayerShot = Date.now();
 				
 		this.rotationalVelocity = 200;
 		this.initializeTank();
@@ -106,11 +107,17 @@
 	}
 	
 	Tank.prototype.fire = function() {
-		// TODO: get correct starting x and y
-		//
-		// TODO: this will get fired 60 times per second, we need
-		// to implement the cooldown!
-		this.shouldFireHandler(this.turret.x, this.turret.y, this.turret.rotation);
+		// Don't allow for fire spamming.
+		if (Date.now() - this.lastPlayerShot < 500) {
+			return;
+		}
+		
+		var rotationRadians = this.turret.rotation * Math.PI / 180;
+		var startingX = this.turret.x + this.turret.image.width * Math.cos(rotationRadians);
+		var startingY = this.turret.y + this.turret.image.width * Math.sin(rotationRadians);
+		
+		this.lastPlayerShot = Date.now();
+		this.shouldFireHandler(startingX, startingY, this.turret.rotation);
 	}
 	
 	Tank.prototype.setCollisions = function(collisions) {	
