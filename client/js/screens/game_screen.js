@@ -19,22 +19,19 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.createTanks = function() {
-		this.physicalObjects = [
-			new tfn.Tank(90, 90)
-		];
-		
-		this.tank = this.physicalObjects[0];
-		
-		for (var i = 0; i < this.physicalObjects.length; i++) {
-			this.addChild(this.physicalObjects[i]);
-		}
+		this.tank = new tfn.Tank(90, 90);
+
+		this.addChild(this.tank);
 		
 		this.tank.stateChangedHandler = function(x, y, tankRotation, turretRotation) {
-
+			
 		}
 		
+		var me = this;
 		this.tank.shouldFireHandler = function(startingX, startingY, angle) {
-			console.log("should fire at rotation: " + angle);
+			var bullet = new tfn.Bullet(startingX, startingY, angle);
+			
+			me.addChild(bullet);
 		}
 	}
 	
@@ -104,11 +101,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		this.tank.setCollisions(collisionDetector.collisions);
 		
 		// Send a tick event to all of the physical objects we're
-		// simulating.			
-		for (var i = 0; i < this.physicalObjects.length; i++) {
-			this.physicalObjects[i].tick(event);
+		// simulating.	
+		for (var i = 0; i < this.getNumChildren(); i++) {
+			if (this.getChildAt(i) instanceof tfn.PhysicalBitmap) {
+				this.getChildAt(i).tick(event);
+			}
 		}
-		
+
 		game.stage.update();
 	}
 });

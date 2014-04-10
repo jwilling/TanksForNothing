@@ -16,5 +16,5 @@ tfn.resources = [
 	{ id: "tank-body-red", src: "data/img/tank-body-red.png" },
 	{ id: "tank-turret-red", src: "data/img/tank-turret-red.png" },
 	{ id: "map-blue", src: "data/img/map-blue.png" },
-	{ id: "tank-bullet-red", src: "data/img/tank-turret-red.png" }
+	{ id: "tank-bullet-red", src: "data/img/tank-bullet-red.png" }
 ];
