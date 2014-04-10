@@ -1,46 +1,20 @@
-game.resources = [
-
-	/* Graphics. 
-	 * @example
-	 * {name: "example", type:"image", src: "data/img/example.png"},
-	 */
-	{ name: "title-background", type: "image", src: "data/img/sliced/title-background.png" },
-	{ name: "background", type: "image", src: "data/img/sliced/background.png" },
-	
-	// Main menu buttons.
-	{ name: "menu-button-credits", type: "image", src: "data/img/sliced/menu-button-credits.png" },
-	{ name: "menu-button-new-game", type: "image", src: "data/img/sliced/menu-button-new-game.png" },
-	{ name: "menu-button-options", type: "image", src: "data/img/sliced/menu-button-options.png" },
-	{ name: "menu-button-tutorial", type: "image", src: "data/img/sliced/menu-button-tutorial.png" },
-	
-	
-	{name: "area01_level_tiles", type:"image", src: "data/img/map/area01_level_tiles.png"},
-	{name: "blue_tiles", type:"image", src: "data/img/map/blue_tiles.png"},
-
-	{ name: "tank-body-red", type: "image", src: "data/img/sliced/tank-body-red.png" },
-	{ name: "tank-turret-red", type: "image", src: "data/img/sliced/tank-turret-red.png" },
-
-	/* Atlases 
-	 * @example
-	 * {name: "example_tps", type: "tps", src: "data/img/example_tps.json"},
-	 */
-		
-	/* Maps. 
-	 * @example
-	 * {name: "example01", type: "tmx", src: "data/map/example01.tmx"},
-	 * {name: "example01", type: "tmx", src: "data/map/example01.json"},
- 	 */
-	{name: "area01", type: "tmx", src: "data/map/area01.tmx"},
-	{name: "bloodGultch", type: "tmx",src: "data/map/bloodGultch.tmx"},
-	{name: "blue", type:"tmx", src: "data/map/blue.tmx"},
-	{name:"blue_map_img", type:"image", src: "data/map/blue.png"},
-	/* Background music. 
-	 * @example
-	 * {name: "example_bgm", type: "audio", src: "data/bgm/", channel : 1},
-	 */	
-
-	/* Sound effects. 
-	 * @example
-	 * {name: "example_sfx", type: "audio", src: "data/sfx/", channel : 2}
-	 */
+tfn.resources = [
+	{ id: "background", src: "data/img/background.png" },
+	{ id: "background-title", src: "data/img/background-title.png" },
+	{ id: "background-blank", src: "data/img/background-blank.png" },
+	{ id: "menu-button-credits", src: "data/img/menu-button-credits.png" },
+	{ id: "menu-button-new-game", src: "data/img/menu-button-new-game.png" },
+	{ id: "menu-button-options", src: "data/img/menu-button-options.png" },
+	{ id: "menu-button-tutorial", src: "data/img/menu-button-tutorial.png" },
+	{ id: "menu-button-create-game", src: "data/img/menu-button-create-game.png" },
+	{ id: "menu-button-join-game", src: "data/img/menu-button-join-game.png" },
+	{ id: "menu-button-exit-lobby", src: "data/img/menu-button-exit-lobby.png" },
+	{ id: "menu-button-start-game", src: "data/img/menu-button-start-game.png" },
+	{ id: "menu-label-waiting", src: "data/img/menu-label-waiting.png" },
+	{ id: "menu-button-ready", src: "data/img/menu-button-ready.png" },
+	{ id: "menu-image-instructions", src: "data/img/menu-image-instructions.png" },
+	{ id: "tank-body-red", src: "data/img/tank-body-red.png" },
+	{ id: "tank-turret-red", src: "data/img/tank-turret-red.png" },
+	{ id: "map-blue", src: "data/img/map-blue.png" },
+	{ id: "tank-bullet-red", src: "data/img/tank-bullet-red.png" }
 ];
