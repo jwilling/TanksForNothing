@@ -13,8 +13,19 @@ tfn.resources = [
 	{ id: "menu-label-waiting", src: "data/img/menu-label-waiting.png" },
 	{ id: "menu-button-ready", src: "data/img/menu-button-ready.png" },
 	{ id: "menu-image-instructions", src: "data/img/menu-image-instructions.png" },
-	{ id: "tank-body-red", src: "data/img/tank-body-red.png" },
-	{ id: "tank-turret-red", src: "data/img/tank-turret-red.png" },
 	{ id: "map-blue", src: "data/img/map-blue.png" },
-	{ id: "tank-bullet-red", src: "data/img/tank-bullet-red.png" }
+	
+	// Tanks
+	{ id: "tank-body-red", src: "data/img/tank-body-red.png" },
+	{ id: "tank-body-green", src: "data/img/tank-body-green.png" },
+	{ id: "tank-body-orange", src: "data/img/tank-body-orange.png" },
+	{ id: "tank-body-yellow", src: "data/img/tank-body-yellow.png" },	
+	{ id: "tank-turret-red", src: "data/img/tank-turret-red.png" },
+	{ id: "tank-turret-green", src: "data/img/tank-turret-green.png" },
+	{ id: "tank-turret-orange", src: "data/img/tank-turret-orange.png" },
+	{ id: "tank-turret-yellow", src: "data/img/tank-turret-yellow.png" },
+	{ id: "tank-bullet-red", src: "data/img/tank-bullet-red.png" },
+	{ id: "tank-bullet-green", src: "data/img/tank-bullet-green.png" },
+	{ id: "tank-bullet-orange", src: "data/img/tank-bullet-orange.png" },
+	{ id: "tank-bullet-yellow", src: "data/img/tank-bullet-yellow.png" },
 ];
