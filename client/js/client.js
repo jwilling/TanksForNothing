@@ -52,7 +52,7 @@ function requestGameEnv(){
 	socket.emit("request_game_env", {});
 }
 
-funciton updateShots(listOfShots){
+function updateShots(listOfShots){
 	socket.emit("update_shots", data);
 }
 
