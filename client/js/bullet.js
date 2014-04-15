@@ -24,7 +24,7 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 	this.tick = function() {
 		base.tick.call(this);
 		
-		var collisionDetector = new tfn.CollisionDetector(this.getCollisionRect(), this.parent.mapBitmap, "map");
+		var collisionDetector = new tfn.CollisionDetector(this.getCollisionRect(), this.parent.mapBitmap, "map", this.currentVelocity);
 		this.setCollisions(collisionDetector.collisions);
 	}
 });

@@ -182,7 +182,6 @@ var setEventHandlers = function() {
 
 
 function onClientUpdatePlayer(client, data){
-	console.log("updating Player");
 	var sessionID = players[client.id].sessionID;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];

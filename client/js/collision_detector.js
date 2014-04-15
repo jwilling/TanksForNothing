@@ -8,10 +8,18 @@
 	// Perform a collision test with the specified Rect, bounding map,
 	// and identifier. The identifier should be unique between bounding maps, as
 	// the map itself is cached internally.
-	var CollisionDetector = function(rect, boundingMap, identifier) {
+	var CollisionDetector = function(rect, boundingMap, identifier, velocity) {
 		// Store the identifier and bitmap.
 		this.identifier = identifier;
 		this.bitmap = boundingMap;
+		
+		this.collisions = {
+			LEFT : false,
+			RIGHT : false,
+			TOP : false,
+			BOTTOM : false,
+			COLLISION : false // whether any collisions occurred
+		}
 		
 		// Get the relative anchor point from the object.
 		//
@@ -26,15 +34,7 @@
 		var rotatedRect = this.createRotatedRect(collisionRect, relativeAnchorPoint, rect.rotation);
 
 		// Finally actually check for collisions.
-		this.calculateCollisions(rotatedRect);
-	}
-
-	CollisionDetector.prototype.collisions = {
-		LEFT : false,
-		RIGHT : false,
-		TOP : false,
-		BOTTOM : false,
-		COLLISION : false // whether any collisions occurred
+		this.calculateCollisions(rotatedRect, velocity);
 	}
 	
 	// Convenience function to clone a point.
@@ -78,7 +78,7 @@
 		rect.p3.x = rect.p2.x;
 		rect.p3.y += collisionRect.height;
 		rect.p4.y = rect.p3.y;
-		
+				
 		return rect;
 	}
 	
@@ -123,11 +123,14 @@
 		var p3 = this.createRotatedPoint(rect.p3, globalAnchorPoint, rotationRadians);
 		var p4 = this.createRotatedPoint(rect.p4, globalAnchorPoint, rotationRadians);
 		
-		return new Rectangle(p1, p2, p3, p4);
+		return new Rectangle(p1, p2, p3, p4, rect.rotation);
 	}
 	
 	// A cache for canvas elements used for sampling pixel data.
 	var canvasCache = { };
+	
+	// A cache for bitmap pixel data.
+	var pixelDataCache = { };
 	
 	// Returns the canvas for the specified identifier with
 	// the bitmap already drawn into it.
@@ -145,6 +148,9 @@
 			// Draw the bitmap into it. This only should be done once
 			// for performance reasons.
 			this.drawBitmapIntoCanvas(canvas);
+			
+			var ctx = canvas.getContext('2d');
+			pixelDataCache[this.identifier] = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 		}
 		
 		return canvas;
@@ -178,7 +184,58 @@
 		ctx.drawImage(bitmap.image, bitmap.x, bitmap.y, bitmap.image.width, bitmap.image.height);
 	}
 	
-	CollisionDetector.prototype.calculateCollisions = function(rotatedRect) {
+	// Returns an array of points, sorted in no particular order.
+	//
+	// The array contains not only the four corner points, but
+	// additional points that are interpolated.
+	CollisionDetector.prototype.createIntermediatePoints = function(rotatedRect) {
+		// Utilize Bresenham's Line Algorithm to interpolate between
+		// the edge points.
+		//
+		// Implementation taken from http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm
+		function bline(x0, y0, x1, y1) {
+			var p = [];
+			
+			x0 = Math.round(x0);
+			y0 = Math.round(y0);
+			x1 = Math.round(x1);
+			y1 = Math.round(y1);
+			
+			var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+			var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
+			var err = (dx > dy ? dx : -dy) / 2;
+						
+			while (true) {
+				p.push(new Point(x0, y0));
+				
+				if (x0 === x1 && y0 === y1) break;
+				var e2 = err;
+				
+				if (e2 > -dx) { err -= dy; x0 += sx; }
+				if (e2 < dy) { err += dx; y0 += sy; }
+			}
+			
+			return p;
+		}
+		
+		var p12Interpolations = bline(rotatedRect.p1.x, rotatedRect.p1.y, rotatedRect.p2.x, rotatedRect.p2.y);
+		var p23Interpolations = bline(rotatedRect.p2.x, rotatedRect.p2.y, rotatedRect.p3.x, rotatedRect.p3.y);
+		var p34Interpolations = bline(rotatedRect.p3.x, rotatedRect.p3.y, rotatedRect.p4.x, rotatedRect.p4.y);
+		var p41Interpolations = bline(rotatedRect.p4.x, rotatedRect.p4.y, rotatedRect.p1.x, rotatedRect.p1.y);
+		
+		return p12Interpolations.concat(p23Interpolations).concat(p34Interpolations).concat(p41Interpolations);
+	}
+	
+	// Returns the center point from the rotated rect.
+	CollisionDetector.prototype.calculateCenterPoint = function(minX, minY, maxX, maxY) {
+		var point = new Point();
+		point.x = (minX + maxX) / 2;
+		point.y = (minY + maxY) / 2;
+		return point;
+	}
+	
+	
+	CollisionDetector.prototype.calculateCollisions = function(rotatedRect, velocity) {		
 		// We need a way to figure out the points that are closest
 		// to each edge, whether it be top, bottom, left, or right.
 		//
@@ -207,38 +264,61 @@
 		sortedByX.sort(sortByX);
 		sortedByY.sort(sortByY);
 		
-		// Now we have to go through all four edges of the points
-		// and see if we have a collision.
-		//
-		// To do this, we'll sample the bitmap that we've drawn
-		// into the temporary canvas we created before using a
-		// specific level of sampling granularity (resolution).
-		//
-		// First construct the sampling points.
-		//     [top, bottom, left, right]
-		var samplingPoints = [sortedByY[0], sortedByY[3], sortedByX[0], sortedByX[3]];
-		var resolution = 1;
+		// Create a list of points that are created via interpolation
+		// between the points on the rotated rect.
+		var edgePoints = this.createIntermediatePoints(rotatedRect);
 		
-		// Grab the canvas drawing context.
-		var canvas = this.cachedSamplingCanvas();
-		var ctx = canvas.getContext('2d');
-
-		// Loop over the sample points and get the pixel data from
-		// the canvas.
-		var samplesPixelData = [];
-		for (var i = 0; i < samplingPoints.length; i++) {
-			var point = samplingPoints[i];
-			var pixel = ctx.getImageData(point.x, point.y, resolution, resolution);
+		// The point at which there is a collision, if any.
+		var collisionPoint = null;
+		
+		// The center point of the rotated rect.
+		var centerPoint = this.calculateCenterPoint(sortedByX[0].x, sortedByY[0].y, sortedByX[3].x, sortedByY[3].y);
+		
+		// Iterate over all of the points and check the pixel
+		// data at that point to see if we have a collision.
+		var canvasWidth = this.cachedSamplingCanvas().width;
+		for (var i = 0; i < edgePoints.length; i++) {
+			var point = edgePoints[i];
+			var imageDataIndex = (point.y * canvasWidth + point.x) * 4;
 			
-			samplesPixelData.push(pixel.data);
+			// Check the alpha channel. If it is not 0% opaque,
+			// we have a hit.
+			//
+			// Remember that the first three channels are RGB, 
+			// and the 4th is alpha. This means index + 2 is
+			// the alpha channel.
+			if (pixelDataCache[this.identifier][imageDataIndex + 2]) {
+				collisionPoint = point;
+				break;
+			}
+		}
+				
+		// No collisions!
+		if (!collisionPoint) {
+			return;
+		}
+
+		var movingUp = (velocity.y > 0);
+		var movingDown = (velocity.y < 0);
+		var movingRight = (velocity.x > 0);
+		var movingLeft = (velocity.x < 0);
+		
+		//console.log("right: " + movingRight + " left: " + movingLeft + " up: " + movingUp + " down: " + movingDown);
+		
+		if (point.y <= centerPoint.y + (centerPoint.y - sortedByY[0].y) / 2 && movingUp) {
+			this.collisions.TOP = true;			
+		} else if (point.y >= centerPoint.y + (sortedByY[3].y - centerPoint.y && movingDown) / 2) {
+			this.collisions.BOTTOM = true;
 		}
 		
-		// Check each location for a collision.
-		this.collisions.TOP = (samplesPixelData[0][3] > 0);
-		this.collisions.BOTTOM = (samplesPixelData[1][3] > 0);
-		this.collisions.LEFT = (samplesPixelData[2][3] > 0);
-		this.collisions.RIGHT = (samplesPixelData[3][3] > 0);
-		this.collisions.COLLISION = this.collisions.TOP || this.collisions.BOTTOM || this.collisions.LEFT || this.collisions.RIGHT;
+		if (point.x <= centerPoint.x + (centerPoint.x - sortedByX[0].x) / 2 && movingLeft) {
+			this.collisions.LEFT = true;
+		} else if (point.x >= centerPoint.x + (sortedByX[3].x - centerPoint.x) / 2 && movingRight) {
+			this.collisions.RIGHT = true;
+		}
+
+				
+		this.collisions.COLLISION = true;
 	}
 	
 	tfn.CollisionDetector = CollisionDetector;
