@@ -116,7 +116,7 @@
 	}
 	
 	Tank.prototype.rotateChild = function(child, amount) {
-		child.rotation += amount;
+		child.rotation = (child.rotation + amount) % 360;
 		this.stateChangedHandler(this.tankBody.x, this.tankBody.y, this.tankBody.rotation, this.turret.rotation);
 	}
 	
