@@ -19,6 +19,7 @@
 		this.shouldFireHandler = function(startingX, startingY, angle) {};
 		this.lastPlayerShot = Date.now();
 				
+		this.currentVelocity = new tfn.Vector2D(0, 0);
 		this.rotationalVelocity = 200;
 		this.initializeTank();
 		this.initializeTurret();
@@ -44,10 +45,6 @@
 		
 		this.addChild(this.turret);
 	}
-
-	Tank.prototype.tick = function() {
-		
-	}
 	
 	Tank.prototype.moveForward = function() {
 		this.move(this.tankVelocity);
@@ -56,14 +53,22 @@
 	Tank.prototype.moveBackward = function() {
 		this.move(-this.tankVelocity);
 	}
+
+	Tank.prototype.resetVelocity = function() {
+		this.currentVelocity = new tfn.Vector2D(0, 0);
+	}
 	
 	Tank.prototype.move = function(velocity) {
 		// Just apply a constant velocity relative to the timestep.
 		var radians = this.tankBody.rotation * (Math.PI / 180);
 		var timestep = tfn.lastTimestep;
-				
-		var x = this.currentPosition.x + velocity * Math.cos(radians) * timestep;
-		var y = this.currentPosition.y + velocity * Math.sin(radians) * timestep;
+	
+		var velocityX = velocity * Math.cos(radians);
+		var velocityY = velocity * Math.sin(radians);
+		var x = this.currentPosition.x + velocityX * timestep
+		var y = this.currentPosition.y + velocityY * timestep;
+		
+		this.currentVelocity = new tfn.Vector2D(velocityX, velocityY);
 		
 		this.setPosition(x, y);
 	}
@@ -79,9 +84,10 @@
 	}
 
 	Tank.prototype.getCollisionRect = function() {
+		//function Rect(x, y, width, height, rotation, anchorPoint) {
 		return new tfn.Rect(
 			this.currentPosition.x, 
-			this.currentPosition.y, 
+			this.currentPosition.y,
 			this.tankBody.image.width, 
 			this.tankBody.image.height, 
 			this.tankBody.rotation, 
