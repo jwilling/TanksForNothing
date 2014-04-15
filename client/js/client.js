@@ -78,9 +78,9 @@ function Player(playerID){
 	this.sessionID = 0;
 }
 
-function Shot(playerID){
-	this.locX = players[playerID].locX;
-	this.locY = players[playerID].locY;
+function Shot(playerID, x, y){
+	this.locX = x || players[playerID].locX;
+	this.locY = y || players[playerID].locY;
 	this.playerID = playerID;
 }
 
