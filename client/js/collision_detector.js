@@ -184,44 +184,44 @@
 		ctx.drawImage(bitmap.image, bitmap.x, bitmap.y, bitmap.image.width, bitmap.image.height);
 	}
 	
+	// Utilize Bresenham's Line Algorithm to interpolate between
+	// the edge points.
+	//
+	// Implementation taken from http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm
+	CollisionDetector.prototype.bline = function(x0, y0, x1, y1) {
+		var p = [];
+		
+		x0 = Math.round(x0);
+		y0 = Math.round(y0);
+		x1 = Math.round(x1);
+		y1 = Math.round(y1);
+		
+		var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+		var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
+		var err = (dx > dy ? dx : -dy) / 2;
+					
+		while (true) {
+			p.push(new Point(x0, y0));
+			
+			if (x0 === x1 && y0 === y1) break;
+			var e2 = err;
+			
+			if (e2 > -dx) { err -= dy; x0 += sx; }
+			if (e2 < dy) { err += dx; y0 += sy; }
+		}
+		
+		return p;
+	}
+	
 	// Returns an array of points, sorted in no particular order.
 	//
 	// The array contains not only the four corner points, but
 	// additional points that are interpolated.
-	CollisionDetector.prototype.createIntermediatePoints = function(rotatedRect) {
-		// Utilize Bresenham's Line Algorithm to interpolate between
-		// the edge points.
-		//
-		// Implementation taken from http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm
-		function bline(x0, y0, x1, y1) {
-			var p = [];
-			
-			x0 = Math.round(x0);
-			y0 = Math.round(y0);
-			x1 = Math.round(x1);
-			y1 = Math.round(y1);
-			
-			var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-			var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
-			var err = (dx > dy ? dx : -dy) / 2;
-						
-			while (true) {
-				p.push(new Point(x0, y0));
-				
-				if (x0 === x1 && y0 === y1) break;
-				var e2 = err;
-				
-				if (e2 > -dx) { err -= dy; x0 += sx; }
-				if (e2 < dy) { err += dx; y0 += sy; }
-			}
-			
-			return p;
-		}
-		
-		var p12Interpolations = bline(rotatedRect.p1.x, rotatedRect.p1.y, rotatedRect.p2.x, rotatedRect.p2.y);
-		var p23Interpolations = bline(rotatedRect.p2.x, rotatedRect.p2.y, rotatedRect.p3.x, rotatedRect.p3.y);
-		var p34Interpolations = bline(rotatedRect.p3.x, rotatedRect.p3.y, rotatedRect.p4.x, rotatedRect.p4.y);
-		var p41Interpolations = bline(rotatedRect.p4.x, rotatedRect.p4.y, rotatedRect.p1.x, rotatedRect.p1.y);
+	CollisionDetector.prototype.createIntermediatePoints = function(rotatedRect) {	
+		var p12Interpolations = this.bline(rotatedRect.p1.x, rotatedRect.p1.y, rotatedRect.p2.x, rotatedRect.p2.y);
+		var p23Interpolations = this.bline(rotatedRect.p2.x, rotatedRect.p2.y, rotatedRect.p3.x, rotatedRect.p3.y);
+		var p34Interpolations = this.bline(rotatedRect.p3.x, rotatedRect.p3.y, rotatedRect.p4.x, rotatedRect.p4.y);
+		var p41Interpolations = this.bline(rotatedRect.p4.x, rotatedRect.p4.y, rotatedRect.p1.x, rotatedRect.p1.y);
 		
 		return p12Interpolations.concat(p23Interpolations).concat(p34Interpolations).concat(p41Interpolations);
 	}
