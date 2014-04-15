@@ -53,7 +53,7 @@ function requestGameEnv(){
 }
 
 function updateShots(listOfShots){
-	socket.emit("update_shots", data);
+	socket.emit("update_shots", listOfShots);
 }
 
 function updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection){
