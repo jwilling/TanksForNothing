@@ -16,14 +16,17 @@ function clientHostGame(callback){
 	sessionUpdateCallback = callback;
 	socket.emit("host_game", {});
 }
+
 //Client uses this to join an open game. 
 function clientJoinGame(callback){
 	sessionUpdateCallback = callback;
 	socket.emit("join_game", {});
 }
+
 function clientStartHostedGame(){
 	socket.emit("start_game", {});
 }
+
 function clientWaitForStartGame(callback){
 	startGameCallback = callback;
 }
@@ -49,11 +52,14 @@ function requestGameEnv(){
 	socket.emit("request_game_env", {});
 }
 
+function updateShots(listOfShots){
+	socket.emit("update_shots", listOfShots);
+}
+
 function updatePlayerPositionOnServer(x, y, bodyDirection, turretDirection){
 	socket.emit("update_player", {locX:x, locY:y, 
 		bodyDirection: bodyDirection, turretDirection: turretDirection});
 }
-
 
 
 //Player Object Constructor
@@ -72,26 +78,22 @@ function Player(playerID){
 	this.sessionID = 0;
 }
 
-function Shot(playerID, direction, chargeLength){
-	this.locX = players[playerID].locX;
-	this.locY = players[playerID].locY;
+function Shot(playerID, x, y){
+	this.locX = x || players[playerID].locX;
+	this.locY = y || players[playerID].locY;
 	this.playerID = playerID;
-	//TODO set damage using charge length;
-	this.damage = 10;
-	this.direction = direction;
-	this.chargeLength = chargeLength;
 }
 
 function GameEnv(sessionID){
-	this.players = {};
-	this.shots = [];
+	this.players = {}; //maps id assigned by server to players. 
+	this.shots = {};
 	this.sessionID = sessionID;
 }
 
 function Session(sessionOwner, settings){
 	if(!settings){
 		settings = {
-			"numPlayers":2,
+			"numPlayers":4,
 			"matchLength": 300,
 		};
 	}
