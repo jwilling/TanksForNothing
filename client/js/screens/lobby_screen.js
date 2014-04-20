@@ -32,7 +32,5 @@ tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 				game.setScreenState(STATE_COUNTDOWN)
 			});
 		}
-		
-		console.log("Are we host? " + isHost);
 	}
 });

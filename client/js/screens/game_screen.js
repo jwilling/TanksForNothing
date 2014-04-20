@@ -1,4 +1,3 @@
-playerIDToTankMappings = {}
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	// Shhh.
 	var me = undefined;
@@ -32,36 +31,31 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.createTanks = function() {
-		// Create a mapping from player IDs to tank sprites.
-		//this.playerIDToTankMappings = {};
-		
 		// A mapping for enemy bullets. The key is the player *number*,
 		// and the value is the list of bullets (not shots!).
-		this.displayedEnemyBullets = {
-			
-		};
+		this.displayedEnemyBullets = { };
 		
-		console.log(this.enemyBullets);
-		// Iterate over the players
+		this.playerIDToTankMappings = { };
+		
+		// Iterate over the players.
 		for (var key in gameEnv.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;
 
 			var player = gameEnv.players[key];
+			this.displayedEnemyBullets[player.playerNum] = [];
 			
 			// Create a new tank, associate it with the player, and
-			// add it as a child.
-			console.log("player number: " + player.playerNum);
-			
+			// add it as a child.			
 			var colorName = this.playerColorMappings[player.playerNum];
 			var tank = new tfn.Tank(player.locX, player.locY, colorName, player.playerNum);
-			playerIDToTankMappings[player.playerID] = tank;
-			this.displayedEnemyBullets[player.playerNum] = [];
+			
+			this.playerIDToTankMappings[player.playerID] = tank;
 			
 			this.addChild(tank);
 		}
 		
 		// Keep a reference to our own tank.
-		this.tank = playerIDToTankMappings[myPlayerID];
+		this.tank = this.playerIDToTankMappings[myPlayerID];
 		
 		// Keep track of when our tank state changes, and emit
 		// this to the server so it can update the game environment.
@@ -167,6 +161,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 		
 		this.emitBulletPositions(ourBullets);
+		this.checkForBulletHits(ourBullets);
 
 		game.stage.update();
 	}
@@ -179,7 +174,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 
 			// We don't want to update our own position from the server.
 			if (player.playerID == myPlayerID) continue;
-			var tank = playerIDToTankMappings[player.playerID];
+			var tank = me.playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
@@ -222,6 +217,31 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			// TODO: resX/Y?
 			this.addChild(bitmap);
 			this.displayedEnemyBullets[playerNum].push(bitmap);
+		}
+	}
+	
+	this.checkForBulletHits = function(ourBullets) {
+		// Check all of the other tanks on the screen
+		// other than our own to see if we have a collision.
+		for (var playerID in this.playerIDToTankMappings) {				
+			if (!this.playerIDToTankMappings.hasOwnProperty(playerID)) continue;
+			if (myPlayerID == playerID) continue;
+			
+			var tank = this.playerIDToTankMappings[playerID];
+			var collisionRect = tank.getCollisionRect();
+			
+			// Loop over all of the bullets to see if they intersect
+			// the collision rect of the tank.
+			for (var i = 0; i < ourBullets.length; i++) {
+				var bullet = ourBullets[i];
+				var point = new tfn.Point(bullet.currentPosition.x, bullet.currentPosition.y);
+				
+				if (collisionRect.containsPoint(point)) {
+					bullet.kill();
+					
+					// TODO: notify server!
+				}
+			}
 		}
 	}
 });
