@@ -73,13 +73,19 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.createHUD = function() {
-		//Text displayed on HUD
+		// Create information labels.
 		this.healthLabel = this.addLabel("Health:", "20px Futura", "white", 300, 743);
 		this.scoreLabel = this.addLabel("Scores", "20px Futura", "white", 480, 4);
-		this.player1ScoreLabel = this.addLabel("1", "20px Futura", "red", 150, 4);
-		this.player2ScoreLabel = this.addLabel("2", "20px Futura", "green", 300, 4);
-		this.player3ScoreLabel = this.addLabel("3", "20px Futura", "orange", 710, 4);
-		this.player4ScoreLabel = this.addLabel("4", "20px Futura", "yellow", 860, 4);
+		
+		// Create the score labels.
+		this.player1ScoreLabel = this.addLabel("", "20px Futura", "red", 150, 4);
+		this.player2ScoreLabel = this.addLabel("", "20px Futura", "green", 300, 4);
+		this.player3ScoreLabel = this.addLabel("", "20px Futura", "orange", 710, 4);
+		this.player4ScoreLabel = this.addLabel("", "20px Futura", "yellow", 860, 4);
+		
+		// Add the score labels to an array so we can associate
+		// it with the player number by index.
+		this.playerScoreLabels = [ this.player1ScoreLabel, this.player2ScoreLabel, this.player3ScoreLabel, this.player4ScoreLabel ];
 
 		// Add the health bar.
 		this.updateHealth(100);
@@ -178,20 +184,27 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;	
 			var player = gameEnv.players[key];
 
-			// We don't want to update our own position from the server.
-			if (player.playerID == myPlayerID) continue;
+			// We don't want to update our own position from the server,
+			// so update our score-related values and continue.
+			if (player.playerID == myPlayerID) {
+				this.updateHealth(player.HP);
+				this.playerScoreLabels[player.playerNum].text = player.kills;
+				continue;
+			};
 			
 			var tank = this.playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
 			
+			// Update the player's score.
+			var playerScoreLabel = this.playerScoreLabels[player.playerNum];
+			playerScoreLabel.text = player.kills;
+			
+			// Update the (fake) bullets on the screen for the current
+			// player and state.
 			this.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
 		}
-		
-		// Update our values.
-		var myPlayer = gameEnv.players[myPlayerID];
-		this.updateHealth(myPlayer.HP);
 	}
 	
 	this.emitBulletPositions = function(ourBullets) {
