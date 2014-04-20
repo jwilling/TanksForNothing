@@ -40,7 +40,9 @@ function removeStartGameCallback(){
 	removeStartGameCallback = new function(data){};
 }
 
-
+function playerHit(playerID){
+	socket.emit("player_hit", {"hit": playerID})
+}
 
 //Update Server Game Env
 function updatePlayerOnServer(){
