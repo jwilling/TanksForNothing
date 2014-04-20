@@ -1,12 +1,7 @@
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
-	// Shhh.
-	var me = undefined;
-	
 	this.constructor = function() {
 		baseConstructor.call(this);
-		
-		me = this;
-		
+				
 		// Add a blank background image.
 		var bitmap = this.addImage("background-blank", 0, 0);
 		
@@ -63,14 +58,18 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			updatePlayerPositionOnServer(x, y, tankRotation, turretRotation);
 		}
 		
-		var me = this;
-		this.tank.shouldFireHandler = function(startingX, startingY, angle, playerNumber) {
-			var colorName = me.playerColorMappings[playerNumber];
-			var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
-			me.addChild(bullet);
-		}
+		// Bind our handler to the tank for when we fire.
+		this.tank.shouldFireHandler = this.ourTankShouldFire.bind(this);
 		
-		gameEnvUpdateCallback = this.updateGameEnvironment;
+		// Bind the update callback function from the client to
+		// our update function.
+		gameEnvUpdateCallback = this.updateGameEnvironment.bind(this);
+	}
+	
+	this.ourTankShouldFire = function(startingX, startingY, angle, playerNumber) {
+		var colorName = this.playerColorMappings[playerNumber];
+		var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
+		this.addChild(bullet);
 	}
 	
 	this.createHUD = function() {
@@ -174,12 +173,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 
 			// We don't want to update our own position from the server.
 			if (player.playerID == myPlayerID) continue;
-			var tank = me.playerIDToTankMappings[player.playerID];
+			
+			var tank = this.playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
 			
-			me.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
+			this.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
 		}
 	}
 	
@@ -194,7 +194,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.updateEnemyBullets = function(shots, playerNum) {		
-		if (typeof me.displayedEnemyBullets.playerNum !== undefined) {
+		if (typeof this.displayedEnemyBullets.playerNum !== undefined) {
 			var existingBullets = this.displayedEnemyBullets[playerNum];
 		
 			for (var i = 0; i < existingBullets.length; i++) {
