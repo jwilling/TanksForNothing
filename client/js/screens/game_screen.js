@@ -1,7 +1,12 @@
 playerIDToTankMappings = {}
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
+	// Shhh.
+	var me = undefined;
+	
 	this.constructor = function() {
 		baseConstructor.call(this);
+		
+		me = this;
 		
 		// Add a blank background image.
 		var bitmap = this.addImage("background-blank", 0, 0);
@@ -30,6 +35,13 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Create a mapping from player IDs to tank sprites.
 		//this.playerIDToTankMappings = {};
 		
+		// A mapping for enemy bullets. The key is the player *number*,
+		// and the value is the list of bullets (not shots!).
+		this.displayedEnemyBullets = {
+			
+		};
+		
+		console.log(this.enemyBullets);
 		// Iterate over the players
 		for (var key in gameEnv.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;
@@ -43,6 +55,8 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			var colorName = this.playerColorMappings[player.playerNum];
 			var tank = new tfn.Tank(player.locX, player.locY, colorName, player.playerNum);
 			playerIDToTankMappings[player.playerID] = tank;
+			this.displayedEnemyBullets[player.playerNum] = [];
+			
 			this.addChild(tank);
 		}
 		
@@ -139,16 +153,24 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		this.tank.setTankRotation(safeTankRect.rotation);
 		
 		// Send a tick event to all of the physical objects we're
-		// simulating.	
+		// simulating.
+		var ourBullets = [];
 		for (var i = 0; i < this.getNumChildren(); i++) {
-			if (this.getChildAt(i) instanceof tfn.PhysicalBitmap) {
-				this.getChildAt(i).tick(event);
+			var object = this.getChildAt(i);
+			if (object instanceof tfn.PhysicalBitmap) {
+				object.tick(event);
+			}
+			
+			if (object instanceof tfn.Bullet) {
+				ourBullets.push(object);
 			}
 		}
 		
+		this.emitBulletPositions(ourBullets);
+
 		game.stage.update();
 	}
-	var me = this;
+	
 	this.updateGameEnvironment = function(env) {
 		// Iterate over the players
 		for (var key in env.players) {
@@ -161,6 +183,45 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
+			
+			me.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
+		}
+	}
+	
+	this.emitBulletPositions = function(ourBullets) {
+		var shots = [];
+		for (var i = 0; i < ourBullets.length; i++) {
+			var currentPosition = ourBullets[i].currentPosition;
+			shots.push(new Shot(myPlayerID, currentPosition.x, currentPosition.y));
+		}
+				
+		updateShots(shots);
+	}
+	
+	this.updateEnemyBullets = function(shots, playerNum) {		
+		if (typeof me.displayedEnemyBullets.playerNum !== undefined) {
+			var existingBullets = this.displayedEnemyBullets[playerNum];
+		
+			for (var i = 0; i < existingBullets.length; i++) {
+				this.removeChild(existingBullets[i]);
+			}
+		}
+
+		this.displayedEnemyBullets[playerNum] = [];
+		shots = shots || [];
+		
+		// Construct new bullets for the shots and add them to our container.
+		for (var i = 0; i < shots.length; i++) {
+			var colorName = this.playerColorMappings[playerNum];
+			var image = tfn.preloader.getResult("tank-bullet-" + colorName);
+			var bitmap = new createjs.Bitmap(image);
+			
+			bitmap.x = shots[i].locX;
+			bitmap.y = shots[i].locY;
+			
+			// TODO: resX/Y?
+			this.addChild(bitmap);
+			this.displayedEnemyBullets[playerNum].push(bitmap);
 		}
 	}
 });

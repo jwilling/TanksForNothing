@@ -1,6 +1,5 @@
 var util = require("util");
 var io = require("socket.io");
-//var express = require("express");
 
 var socket;
 var clients = {};
@@ -44,20 +43,18 @@ function Player(playerID){
 	this.sessionID = 0;
 };
 
-function Shot(playerID, direction, chargeLength){
+function Shot(playerID){
 	this.locX = players[playerID].locX;
 	this.locY = players[playerID].locY;
 	this.playerID = playerID;
-	//TODO set damage using charge length;
 	this.damage = 10;
 	this.direction = direction;
-	this.chargeLength = chargeLength;
 };
 
 
 function GameEnv(sessionID){
 	this.players = {};
-	this.shots = [];
+	this.shots = {};
 	this.sessionID = sessionID;
 	this.lastEmit = new Date();
 };
@@ -174,6 +171,9 @@ var setEventHandlers = function() {
 		client.on("update_player", function(data){
 			onClientUpdatePlayer(client, data);
 		});
+		client.on("update_shots", function(data){
+                        onClientUpdateShots(client, data);
+                });
 	});
 	socket.sockets.on("disconnect", function(client){
 		onClientExitGame(client, {});
@@ -190,6 +190,13 @@ function onClientUpdatePlayer(client, data){
 	player.bodyDirection = data.bodyDirection;
 	player.turretDirection = data.turretDirection;
 	updateGameEnvironmentsForSession(sessionID);	
+}
+
+function onClientUpdateShots(client, data){
+        var sessionID = players[client.id].sessionID;
+        var session = sessions[sessionID];
+	session.gameEnv.shots[client.id] = data
+        updateGameEnvironmentsForSession(sessionID);
 }
 
 function updateGameEnvironmentsForSession(sessionID){
@@ -275,8 +282,9 @@ function onClientJoinGame(client, data){
 			var playerNum = 0;
 			for(var id in gameEnv.players){ playerNum = playerNum + 1; }
 			
-			players[client.id].playerNum = playerNum;
 			gameEnv.addPlayer(client.id);
+			players[client.id].playerNum = playerNum;
+			gameEnv.players[client.id].playerNum = playerNum
 			session.gamEnv = gameEnv;
 			var player_count = 0;
 			for(var pid in gameEnv.players){
