@@ -84,7 +84,6 @@
 	}
 
 	Tank.prototype.getCollisionRect = function() {
-		//function Rect(x, y, width, height, rotation, anchorPoint) {
 		return new tfn.Rect(
 			this.currentPosition.x, 
 			this.currentPosition.y,
@@ -138,27 +137,6 @@
 		
 		this.lastPlayerShot = Date.now();
 		this.shouldFireHandler(startingX, startingY, this.turret.rotation, this.playerNumber);
-	}
-	
-	Tank.prototype.setCollisions = function(collisions) {	
-		if (collisions.LEFT || collisions.RIGHT) {
-			this.setPosition(this.lastKnownSafePosition.x, this.currentPosition.y);
-			
-			if (!collisions.TOP && !collisions.BOTTOM) {
-				this.lastKnownSafePosition.y = this.currentPosition.y;
-			}
-		} else if (collisions.TOP || collisions.BOTTOM) {
-			this.setPosition(this.currentPosition.x, this.lastKnownSafePosition.y);
-			
-			if (!collisions.RIGHT && !collisions.LEFT) {
-				this.lastKnownSafePosition.x = this.currentPosition.x;
-			}
-		}
-		
-		if (!collisions.COLLISION) {
-			this.lastKnownSafePosition = this.currentPosition;
-			this.lastKnownSafeRotation = this.rotation;
-		}
 	}
 	
 	tfn.Tank = Tank;
