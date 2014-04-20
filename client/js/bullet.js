@@ -16,10 +16,14 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 		// Rotate the bullet for easier collision detection.
 		this.rotation = 45;
 		
-		setTimeout(this.kill.bind(this), timeToLive);
+		this.timer = setTimeout(this.kill.bind(this), timeToLive);
 	}
 	
 	this.kill = function() {
+		// Just in case we were killed by something else, remove
+		// the timeout so we don't try to remove a null object.
+		clearTimeout(this.timer);
+		
 		// Remove ourself from the parent as we're now dead!
 		this.parent.removeChild(this);
 	}
