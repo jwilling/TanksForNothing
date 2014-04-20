@@ -14,6 +14,13 @@
 		this.rotation = rotation || 0;
 		this.anchorPoint = anchorPoint || new Vector2D(0, 0);
 	}
+	
+	// Returhs whether or not the point specified by the
+	// x and y values are within the rect.
+	Rect.prototype.containsPoint = function(x, y) {
+		// Ignore rotation for now.
+		return (this.x <= x && x <= this.x + this.width && this.y <= y && y <= this.y + this.height);
+	}
 
 	tfn.Vector2D = Vector2D;
 	tfn.Rect = Rect;
