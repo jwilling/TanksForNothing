@@ -105,6 +105,11 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.tick = function() {
+		// Save the current collision rect of the tank for later
+		// collision checking.		
+		var previousTankCollisionRect = this.tank.getCollisionRect();
+		
+		// Move the tank if needed.
 		this.tank.resetVelocity();
 		if (game.isKeyPressed(KEY_W)) {
 			this.tank.moveForward();
@@ -128,8 +133,10 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.tank.fire();
 		}
 		
-		var collisionDetector = new tfn.CollisionDetector(this.tank.getCollisionRect(), this.mapBitmap, "map", this.tank.currentVelocity);
-		this.tank.setCollisions(collisionDetector.collisions);
+		var collisionDetector = new tfn.CollisionDetector(this.mapBitmap, "map");
+		var safeTankRect = collisionDetector.determineOpenRect(this.tank.getCollisionRect(), previousTankCollisionRect);
+		this.tank.setPosition(safeTankRect.x, safeTankRect.y);
+		this.tank.setTankRotation(safeTankRect.rotation);
 		
 		// Send a tick event to all of the physical objects we're
 		// simulating.	
@@ -138,7 +145,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 				this.getChildAt(i).tick(event);
 			}
 		}
-
+		
 		game.stage.update();
 	}
 	var me = this;
