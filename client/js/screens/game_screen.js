@@ -97,7 +97,6 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			return;
 		}
 		
-		console.log("update health bar with hp: " + health);
 		this.lastDrawnHealth = health;
 		this.removeChild(this.healthBar);
 		
