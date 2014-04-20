@@ -83,25 +83,32 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 
 		// Add the health bar.
 		this.updateHealth(100);
+		this.lastDrawnHealth = 100;
 	}
 	
 	this.updateHealth = function(health) {
+		if (health == this.lastDrawnHealth) {
+			return;
+		}
+		
+		console.log("update health bar with hp: " + health);
+		this.lastDrawnHealth = health;
 		this.removeChild(this.healthBar);
 		
-		//Create New Bar
-		var healthBar = new createjs.Graphics();
+		// Create a new health bar.
+		var drawnHealth = new createjs.Graphics();
 		
-		healthBar.setStrokeStyle(1);
-		healthBar.beginStroke(createjs.Graphics.getRGB(0,255,0));
-		healthBar.beginFill(createjs.Graphics.getRGB(0,255,0));
-		healthBar.drawRect(100,100,health,20);
+		drawnHealth.setStrokeStyle(1);
+		drawnHealth.beginStroke(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.beginFill(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.drawRect(100, 100, health, 20);
 		
-		var bar = new createjs.Shape(healthBar);
-		bar.x = 365;
-		bar.y = 645;
+		this.healthBar = new createjs.Shape(drawnHealth);
+		this.healthBar.x = 365;
+		this.healthBar.y = 645;
 		
 		//Add it
-		this.addChild(bar);
+		this.addChild(this.healthBar);
 	}
 	
 	this.updatePlayerScores = function(player1Score, player2Score, player3Score, player4Score) {
@@ -181,6 +188,10 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			
 			this.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
 		}
+		
+		// Update our values.
+		var myPlayer = gameEnv.players[myPlayerID];
+		this.updateHealth(myPlayer.HP);
 	}
 	
 	this.emitBulletPositions = function(ourBullets) {
