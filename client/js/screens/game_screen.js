@@ -238,8 +238,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 				
 				if (collisionRect.containsPoint(point)) {
 					bullet.kill();
-					
-					// TODO: notify server!
+					playerHit(playerID);
 				}
 			}
 		}
