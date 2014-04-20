@@ -78,9 +78,9 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		this.healthLabel = this.addLabel("Health:", "20px Futura", "white", 300, 743);
 		this.scoreLabel = this.addLabel("Scores", "20px Futura", "white", 480, 4);
 		this.player1ScoreLabel = this.addLabel("1", "20px Futura", "red", 150, 4);
-		this.player2ScoreLabel = this.addLabel("2", "20px Futura", "yellow", 300, 4);
-		this.player3ScoreLabel = this.addLabel("3", "20px Futura", "green", 710, 4);
-		this.player4ScoreLabel = this.addLabel("4", "20px Futura", "white", 860, 4);
+		this.player2ScoreLabel = this.addLabel("2", "20px Futura", "green", 300, 4);
+		this.player3ScoreLabel = this.addLabel("3", "20px Futura", "orange", 710, 4);
+		this.player4ScoreLabel = this.addLabel("4", "20px Futura", "yellow", 860, 4);
 
 		// Add the health bar.
 		this.updateHealth(100);
