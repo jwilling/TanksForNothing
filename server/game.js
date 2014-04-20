@@ -325,6 +325,7 @@ function onClientJoinGame(client, data){
 				clients[clientID].emit("update_game_env", session.gameEnv);
 			}
 			client.emit("update_game_session", session);
+			updateGameEnvironmentsForSession(sessionID);
 		}
 	}
 	//if(empty){
