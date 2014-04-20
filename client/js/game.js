@@ -1,6 +1,5 @@
 // Namespace.
 this.tfn = this.tfn || {};
-var stage;
 var game = {
 	start : function() {
 		// Create the stage with the canvas associated with the
