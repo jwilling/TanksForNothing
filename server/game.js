@@ -174,6 +174,9 @@ var setEventHandlers = function() {
 		client.on("update_shots", function(data){
                         onClientUpdateShots(client, data);
                 });
+		client.on("player_hit", function(data){
+			onClientPlayerHit(client, data);
+		});
 	});
 	socket.sockets.on("disconnect", function(client){
 		onClientExitGame(client, {});
@@ -196,6 +199,31 @@ function onClientUpdateShots(client, data){
         var sessionID = players[client.id].sessionID;
         var session = sessions[sessionID];
 	session.gameEnv.shots[client.id] = data
+        updateGameEnvironmentsForSession(sessionID);
+}
+
+function onClientPlayerHit(client, data){ //bad name...client indicating player is hit...
+	var sessionID = players[client.id].sessionID;
+        var session = sessions[sessionID];
+	var gameEnv = session.gameEnv
+	var playerHitID = data["hit"];
+	var shooting = gameEnv.players[client.id];
+	var hit = gameEnv.players[playerHitID];
+
+	var SHOT_DAMAGE = 25;
+
+	hit.HP = hit.HP - SHOT_DAMAGE;
+        if (hit.HP <= 0) {
+		shooting.kills = shooting.kills + 1;
+		hit.deaths = hit.deaths + 1;
+		hit.HP = 100;
+	}
+
+	gameEnv.players[client.id] = shooting;
+	gameEnv.players[playerHitID] = hit
+	session.gameEnv = gameEnv;
+	sessions[sessionID] = session;
+
         updateGameEnvironmentsForSession(sessionID);
 }
 
