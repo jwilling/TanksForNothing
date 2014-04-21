@@ -1,12 +1,7 @@
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
-	// Shhh.
-	var me = undefined;
-	
 	this.constructor = function() {
 		baseConstructor.call(this);
-		
-		me = this;
-		
+				
 		// Add a blank background image.
 		var bitmap = this.addImage("background-blank", 0, 0);
 		
@@ -63,46 +58,62 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			updatePlayerPositionOnServer(x, y, tankRotation, turretRotation);
 		}
 		
-		var me = this;
-		this.tank.shouldFireHandler = function(startingX, startingY, angle, playerNumber) {
-			var colorName = me.playerColorMappings[playerNumber];
-			var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
-			me.addChild(bullet);
-		}
+		// Bind our handler to the tank for when we fire.
+		this.tank.shouldFireHandler = this.ourTankShouldFire.bind(this);
 		
-		gameEnvUpdateCallback = this.updateGameEnvironment;
+		// Bind the update callback function from the client to
+		// our update function.
+		gameEnvUpdateCallback = this.updateGameEnvironment.bind(this);
+	}
+	
+	this.ourTankShouldFire = function(startingX, startingY, angle, playerNumber) {
+		var colorName = this.playerColorMappings[playerNumber];
+		var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
+		this.addChild(bullet);
 	}
 	
 	this.createHUD = function() {
-		//Text displayed on HUD
+		// Create information labels.
 		this.healthLabel = this.addLabel("Health:", "20px Futura", "white", 300, 743);
 		this.scoreLabel = this.addLabel("Scores", "20px Futura", "white", 480, 4);
-		this.player1ScoreLabel = this.addLabel("1", "20px Futura", "red", 150, 4);
-		this.player2ScoreLabel = this.addLabel("2", "20px Futura", "yellow", 300, 4);
-		this.player3ScoreLabel = this.addLabel("3", "20px Futura", "green", 710, 4);
-		this.player4ScoreLabel = this.addLabel("4", "20px Futura", "white", 860, 4);
+		
+		// Create the score labels.
+		this.player1ScoreLabel = this.addLabel("", "20px Futura", "red", 150, 4);
+		this.player2ScoreLabel = this.addLabel("", "20px Futura", "green", 300, 4);
+		this.player3ScoreLabel = this.addLabel("", "20px Futura", "orange", 710, 4);
+		this.player4ScoreLabel = this.addLabel("", "20px Futura", "yellow", 860, 4);
+		
+		// Add the score labels to an array so we can associate
+		// it with the player number by index.
+		this.playerScoreLabels = [ this.player1ScoreLabel, this.player2ScoreLabel, this.player3ScoreLabel, this.player4ScoreLabel ];
 
 		// Add the health bar.
 		this.updateHealth(100);
+		this.lastDrawnHealth = 100;
 	}
 	
 	this.updateHealth = function(health) {
+		if (health == this.lastDrawnHealth) {
+			return;
+		}
+		
+		this.lastDrawnHealth = health;
 		this.removeChild(this.healthBar);
 		
-		//Create New Bar
-		var healthBar = new createjs.Graphics();
+		// Create a new health bar.
+		var drawnHealth = new createjs.Graphics();
 		
-		healthBar.setStrokeStyle(1);
-		healthBar.beginStroke(createjs.Graphics.getRGB(0,255,0));
-		healthBar.beginFill(createjs.Graphics.getRGB(0,255,0));
-		healthBar.drawRect(100,100,health,20);
+		drawnHealth.setStrokeStyle(1);
+		drawnHealth.beginStroke(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.beginFill(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.drawRect(100, 100, health, 20);
 		
-		var bar = new createjs.Shape(healthBar);
-		bar.x = 365;
-		bar.y = 645;
+		this.healthBar = new createjs.Shape(drawnHealth);
+		this.healthBar.x = 365;
+		this.healthBar.y = 645;
 		
 		//Add it
-		this.addChild(bar);
+		this.addChild(this.healthBar);
 	}
 	
 	this.updatePlayerScores = function(player1Score, player2Score, player3Score, player4Score) {
@@ -172,14 +183,26 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;	
 			var player = gameEnv.players[key];
 
-			// We don't want to update our own position from the server.
-			if (player.playerID == myPlayerID) continue;
-			var tank = me.playerIDToTankMappings[player.playerID];
+			// We don't want to update our own position from the server,
+			// so update our score-related values and continue.
+			if (player.playerID == myPlayerID) {
+				this.updateHealth(player.HP);
+				this.playerScoreLabels[player.playerNum].text = player.kills;
+				continue;
+			};
+			
+			var tank = this.playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
 			
-			me.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
+			// Update the player's score.
+			var playerScoreLabel = this.playerScoreLabels[player.playerNum];
+			playerScoreLabel.text = player.kills;
+			
+			// Update the (fake) bullets on the screen for the current
+			// player and state.
+			this.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
 		}
 	}
 	
@@ -194,7 +217,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.updateEnemyBullets = function(shots, playerNum) {		
-		if (typeof me.displayedEnemyBullets.playerNum !== undefined) {
+		if (typeof this.displayedEnemyBullets.playerNum !== undefined) {
 			var existingBullets = this.displayedEnemyBullets[playerNum];
 		
 			for (var i = 0; i < existingBullets.length; i++) {

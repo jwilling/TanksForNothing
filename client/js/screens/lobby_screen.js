@@ -1,7 +1,7 @@
 tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	this.constructor = function(isHost) {
 		baseConstructor.call(this);
-				
+		
 		// Add the background.
 		this.addImage("background", 0, 0);
 		
@@ -32,5 +32,30 @@ tfn.LobbyScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 				game.setScreenState(STATE_COUNTDOWN)
 			});
 		}
+		
+		
+		// Update our labels whenever the game env updates, meaning
+		// a player has either joined or left the game.
+		gameEnvUpdateCallback = this.updatePlayerLabels.bind(this);
+		this.updatePlayerLabels(gameEnv);
+	}
+	
+	this.updatePlayerLabels = function(env) {
+		var text = "";
+		
+		// Iterate over the players.
+		for (var key in env.players) {
+			if (!env.players.hasOwnProperty(key)) continue;
+			var player = gameEnv.players[key];
+			text += "Player " + player.playerNum + "\n";
+		}
+		
+		if (this.playersLabel) {
+			this.removeChild(this.playersLabel);
+		}
+		
+		this.playersLabel = this.addLabel(text, "24px Futura", "white", 465, 350);
+		
+		game.stage.update();
 	}
 });
