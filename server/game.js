@@ -6,6 +6,13 @@ var clients = {};
 var players = {}; //maps player ids to player;
 var sessions = {};
 
+var SPAWN = [
+    [90, 90],
+    [934, 90],
+    [90, 678],
+    [934, 678],
+]
+
 //helper func to count actual size of object. 
 //taken from http://stackoverflow.com/a/6700
 Object.size = function(obj) {
@@ -202,6 +209,48 @@ function onClientUpdateShots(client, data){
         updateGameEnvironmentsForSession(sessionID);
 }
 
+function distance(x1, y1, x2, y2){
+	return Math.sqrt( (x2-x1)^2 + (y2-y1)^2 );
+}
+
+function spawnPlayerAway(player){
+	//Set player x & y to farthest point away from average. 
+
+
+	avgX = 0;
+        avgY = 0;
+
+	var session = sessions[player.sessionID];
+	
+	count = 0;
+	for( var p in session.gameEnv.players){
+		if (p.playerID == player.playerID) continue;
+		count = count + 1;
+		avgX = avgX + p.locX;
+		avgY = avgY + p.locY;
+	}
+	if(count == 0) count = count + 1;
+	avgX = avgX/count;
+	avgY = avgY/count;
+
+	spawn = 0;
+        maxDist = 0;
+
+	for(var i = 0; i < SPAWN.length; i++){
+		var d = distance(avgX, avgY, SPAWN[i][0], SPAWN[i][1]);
+		if(d > maxDist){ 
+			spawn = i;
+			maxDist = d;
+		}
+	}
+	
+	player.locX = SPAWN[spawn][0];
+	player.locY = SPAWN[spawn][i];
+
+	return player;
+
+}
+
 function onClientPlayerHit(client, data){ //bad name...client indicating player is hit...
 	var sessionID = players[client.id].sessionID;
         var session = sessions[sessionID];
@@ -217,6 +266,7 @@ function onClientPlayerHit(client, data){ //bad name...client indicating player 
 		shooting.kills = shooting.kills + 1;
 		hit.deaths = hit.deaths + 1;
 		hit.HP = 100;
+		hit = spawnPlayerAway(hit);
 	}
 
 	gameEnv.players[client.id] = shooting;
@@ -309,10 +359,18 @@ function onClientJoinGame(client, data){
 			players[client.id].sessionID = session_id;
 			var playerNum = 0;
 			for(var id in gameEnv.players){ playerNum = playerNum + 1; }
-			
+				
 			gameEnv.addPlayer(client.id);
+			
 			players[client.id].playerNum = playerNum;
-			gameEnv.players[client.id].playerNum = playerNum
+			gameEnv.players[client.id].playerNum = playerNum;
+
+			players[client.id].locX = SPAWN[playerNum][0];
+			players[client.id].locY = SPAWN[playerNum][1];
+
+                        gameEnv.players[client.id].locX = SPAWN[playerNum][0];
+                        gameEnv.players[client.id].locY = SPAWN[playerNum][1];
+
 			session.gamEnv = gameEnv;
 			var player_count = 0;
 			for(var pid in gameEnv.players){
