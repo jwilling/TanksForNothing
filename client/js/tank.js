@@ -19,6 +19,7 @@
 		this.shouldFireHandler = function(startingX, startingY, angle) {};
 		this.lastPlayerShot = Date.now();
 				
+		this.currentVelocity = new tfn.Vector2D(0, 0);
 		this.rotationalVelocity = 200;
 		this.initializeTank();
 		this.initializeTurret();
@@ -44,10 +45,6 @@
 		
 		this.addChild(this.turret);
 	}
-
-	Tank.prototype.tick = function() {
-		
-	}
 	
 	Tank.prototype.moveForward = function() {
 		this.move(this.tankVelocity);
@@ -56,14 +53,22 @@
 	Tank.prototype.moveBackward = function() {
 		this.move(-this.tankVelocity);
 	}
+
+	Tank.prototype.resetVelocity = function() {
+		this.currentVelocity = new tfn.Vector2D(0, 0);
+	}
 	
 	Tank.prototype.move = function(velocity) {
 		// Just apply a constant velocity relative to the timestep.
 		var radians = this.tankBody.rotation * (Math.PI / 180);
 		var timestep = tfn.lastTimestep;
-				
-		var x = this.currentPosition.x + velocity * Math.cos(radians) * timestep;
-		var y = this.currentPosition.y + velocity * Math.sin(radians) * timestep;
+	
+		var velocityX = velocity * Math.cos(radians);
+		var velocityY = velocity * Math.sin(radians);
+		var x = this.currentPosition.x + velocityX * timestep
+		var y = this.currentPosition.y + velocityY * timestep;
+		
+		this.currentVelocity = new tfn.Vector2D(velocityX, velocityY);
 		
 		this.setPosition(x, y);
 	}
@@ -81,7 +86,7 @@
 	Tank.prototype.getCollisionRect = function() {
 		return new tfn.Rect(
 			this.currentPosition.x, 
-			this.currentPosition.y, 
+			this.currentPosition.y,
 			this.tankBody.image.width, 
 			this.tankBody.image.height, 
 			this.tankBody.rotation, 
@@ -116,7 +121,7 @@
 	}
 	
 	Tank.prototype.rotateChild = function(child, amount) {
-		child.rotation += amount;
+		child.rotation = (child.rotation + amount) % 360;
 		this.stateChangedHandler(this.tankBody.x, this.tankBody.y, this.tankBody.rotation, this.turret.rotation);
 	}
 	
@@ -132,27 +137,6 @@
 		
 		this.lastPlayerShot = Date.now();
 		this.shouldFireHandler(startingX, startingY, this.turret.rotation, this.playerNumber);
-	}
-	
-	Tank.prototype.setCollisions = function(collisions) {	
-		if (collisions.LEFT || collisions.RIGHT) {
-			this.setPosition(this.lastKnownSafePosition.x, this.currentPosition.y);
-			
-			if (!collisions.TOP && !collisions.BOTTOM) {
-				this.lastKnownSafePosition.y = this.currentPosition.y;
-			}
-		} else if (collisions.TOP || collisions.BOTTOM) {
-			this.setPosition(this.currentPosition.x, this.lastKnownSafePosition.y);
-			
-			if (!collisions.RIGHT && !collisions.LEFT) {
-				this.lastKnownSafePosition.x = this.currentPosition.x;
-			}
-		}
-		
-		if (!collisions.COLLISION) {
-			this.lastKnownSafePosition = this.currentPosition;
-			this.lastKnownSafeRotation = this.rotation;
-		}
 	}
 	
 	tfn.Tank = Tank;

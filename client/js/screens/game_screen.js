@@ -1,13 +1,7 @@
-playerIDToTankMappings = {}
 tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
-	// Shhh.
-	var me = undefined;
-	
 	this.constructor = function() {
 		baseConstructor.call(this);
-		
-		me = this;
-		
+				
 		// Add a blank background image.
 		var bitmap = this.addImage("background-blank", 0, 0);
 		
@@ -32,36 +26,31 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.createTanks = function() {
-		// Create a mapping from player IDs to tank sprites.
-		//this.playerIDToTankMappings = {};
-		
 		// A mapping for enemy bullets. The key is the player *number*,
 		// and the value is the list of bullets (not shots!).
-		this.displayedEnemyBullets = {
-			
-		};
+		this.displayedEnemyBullets = { };
 		
-		console.log(this.enemyBullets);
-		// Iterate over the players
+		this.playerIDToTankMappings = { };
+		
+		// Iterate over the players.
 		for (var key in gameEnv.players) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;
 
 			var player = gameEnv.players[key];
+			this.displayedEnemyBullets[player.playerNum] = [];
 			
 			// Create a new tank, associate it with the player, and
-			// add it as a child.
-			console.log("player number: " + player.playerNum);
-			
+			// add it as a child.			
 			var colorName = this.playerColorMappings[player.playerNum];
 			var tank = new tfn.Tank(player.locX, player.locY, colorName, player.playerNum);
-			playerIDToTankMappings[player.playerID] = tank;
-			this.displayedEnemyBullets[player.playerNum] = [];
+			
+			this.playerIDToTankMappings[player.playerID] = tank;
 			
 			this.addChild(tank);
 		}
 		
 		// Keep a reference to our own tank.
-		this.tank = playerIDToTankMappings[myPlayerID];
+		this.tank = this.playerIDToTankMappings[myPlayerID];
 		
 		// Keep track of when our tank state changes, and emit
 		// this to the server so it can update the game environment.
@@ -69,46 +58,62 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			updatePlayerPositionOnServer(x, y, tankRotation, turretRotation);
 		}
 		
-		var me = this;
-		this.tank.shouldFireHandler = function(startingX, startingY, angle, playerNumber) {
-			var colorName = me.playerColorMappings[playerNumber];
-			var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
-			me.addChild(bullet);
-		}
+		// Bind our handler to the tank for when we fire.
+		this.tank.shouldFireHandler = this.ourTankShouldFire.bind(this);
 		
-		gameEnvUpdateCallback = this.updateGameEnvironment;
+		// Bind the update callback function from the client to
+		// our update function.
+		gameEnvUpdateCallback = this.updateGameEnvironment.bind(this);
+	}
+	
+	this.ourTankShouldFire = function(startingX, startingY, angle, playerNumber) {
+		var colorName = this.playerColorMappings[playerNumber];
+		var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);
+		this.addChild(bullet);
 	}
 	
 	this.createHUD = function() {
-		//Text displayed on HUD
+		// Create information labels.
 		this.healthLabel = this.addLabel("Health:", "20px Futura", "white", 300, 743);
 		this.scoreLabel = this.addLabel("Scores", "20px Futura", "white", 480, 4);
-		this.player1ScoreLabel = this.addLabel("1", "20px Futura", "red", 150, 4);
-		this.player2ScoreLabel = this.addLabel("2", "20px Futura", "yellow", 300, 4);
-		this.player3ScoreLabel = this.addLabel("3", "20px Futura", "green", 710, 4);
-		this.player4ScoreLabel = this.addLabel("4", "20px Futura", "white", 860, 4);
+		
+		// Create the score labels.
+		this.player1ScoreLabel = this.addLabel("", "20px Futura", "red", 150, 4);
+		this.player2ScoreLabel = this.addLabel("", "20px Futura", "green", 300, 4);
+		this.player3ScoreLabel = this.addLabel("", "20px Futura", "orange", 710, 4);
+		this.player4ScoreLabel = this.addLabel("", "20px Futura", "yellow", 860, 4);
+		
+		// Add the score labels to an array so we can associate
+		// it with the player number by index.
+		this.playerScoreLabels = [ this.player1ScoreLabel, this.player2ScoreLabel, this.player3ScoreLabel, this.player4ScoreLabel ];
 
 		// Add the health bar.
 		this.updateHealth(100);
+		this.lastDrawnHealth = 100;
 	}
 	
 	this.updateHealth = function(health) {
+		if (health == this.lastDrawnHealth) {
+			return;
+		}
+		
+		this.lastDrawnHealth = health;
 		this.removeChild(this.healthBar);
 		
-		//Create New Bar
-		var healthBar = new createjs.Graphics();
+		// Create a new health bar.
+		var drawnHealth = new createjs.Graphics();
 		
-		healthBar.setStrokeStyle(1);
-		healthBar.beginStroke(createjs.Graphics.getRGB(0,255,0));
-		healthBar.beginFill(createjs.Graphics.getRGB(0,255,0));
-		healthBar.drawRect(100,100,health,20);
+		drawnHealth.setStrokeStyle(1);
+		drawnHealth.beginStroke(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.beginFill(createjs.Graphics.getRGB(0,255,0));
+		drawnHealth.drawRect(100, 100, health, 20);
 		
-		var bar = new createjs.Shape(healthBar);
-		bar.x = 365;
-		bar.y = 645;
+		this.healthBar = new createjs.Shape(drawnHealth);
+		this.healthBar.x = 365;
+		this.healthBar.y = 645;
 		
 		//Add it
-		this.addChild(bar);
+		this.addChild(this.healthBar);
 	}
 	
 	this.updatePlayerScores = function(player1Score, player2Score, player3Score, player4Score) {
@@ -119,6 +124,12 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.tick = function() {
+		// Save the current collision rect of the tank for later
+		// collision checking.		
+		var previousTankCollisionRect = this.tank.getCollisionRect();
+		
+		// Move the tank if needed.
+		this.tank.resetVelocity();
 		if (game.isKeyPressed(KEY_W)) {
 			this.tank.moveForward();
 		}
@@ -141,8 +152,10 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			this.tank.fire();
 		}
 		
-		var collisionDetector = new tfn.CollisionDetector(this.tank.getCollisionRect(), this.mapBitmap, "map");
-		this.tank.setCollisions(collisionDetector.collisions);
+		var collisionDetector = new tfn.CollisionDetector(this.mapBitmap, "map");
+		var safeTankRect = collisionDetector.determineOpenRect(this.tank.getCollisionRect(), previousTankCollisionRect);
+		this.tank.setPosition(safeTankRect.x, safeTankRect.y);
+		this.tank.setTankRotation(safeTankRect.rotation);
 		
 		// Send a tick event to all of the physical objects we're
 		// simulating.
@@ -159,6 +172,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		}
 		
 		this.emitBulletPositions(ourBullets);
+		this.checkForBulletHits(ourBullets);
 
 		game.stage.update();
 	}
@@ -169,14 +183,26 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			if (!gameEnv.players.hasOwnProperty(key)) continue;	
 			var player = gameEnv.players[key];
 
-			// We don't want to update our own position from the server.
-			if (player.playerID == myPlayerID) continue;
-			var tank = playerIDToTankMappings[player.playerID];
+			// We don't want to update our own position from the server,
+			// so update our score-related values and continue.
+			if (player.playerID == myPlayerID) {
+				this.updateHealth(player.HP);
+				this.playerScoreLabels[player.playerNum].text = player.kills;
+				continue;
+			};
+			
+			var tank = this.playerIDToTankMappings[player.playerID];
 			tank.setPosition(player.locX, player.locY);
 			tank.setTankRotation(player.bodyDirection);
 			tank.setTurretRotation(player.turretDirection);
 			
-			me.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
+			// Update the player's score.
+			var playerScoreLabel = this.playerScoreLabels[player.playerNum];
+			playerScoreLabel.text = player.kills;
+			
+			// Update the (fake) bullets on the screen for the current
+			// player and state.
+			this.updateEnemyBullets(env.shots[player.playerID], player.playerNum);
 		}
 	}
 	
@@ -191,7 +217,7 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 	}
 	
 	this.updateEnemyBullets = function(shots, playerNum) {		
-		if (typeof me.displayedEnemyBullets.playerNum !== undefined) {
+		if (typeof this.displayedEnemyBullets.playerNum !== undefined) {
 			var existingBullets = this.displayedEnemyBullets[playerNum];
 		
 			for (var i = 0; i < existingBullets.length; i++) {
@@ -214,6 +240,30 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 			// TODO: resX/Y?
 			this.addChild(bitmap);
 			this.displayedEnemyBullets[playerNum].push(bitmap);
+		}
+	}
+	
+	this.checkForBulletHits = function(ourBullets) {
+		// Check all of the other tanks on the screen
+		// other than our own to see if we have a collision.
+		for (var playerID in this.playerIDToTankMappings) {				
+			if (!this.playerIDToTankMappings.hasOwnProperty(playerID)) continue;
+			if (myPlayerID == playerID) continue;
+			
+			var tank = this.playerIDToTankMappings[playerID];
+			var collisionRect = tank.getCollisionRect();
+			
+			// Loop over all of the bullets to see if they intersect
+			// the collision rect of the tank.
+			for (var i = 0; i < ourBullets.length; i++) {
+				var bullet = ourBullets[i];
+				var point = new tfn.Point(bullet.currentPosition.x, bullet.currentPosition.y);
+				
+				if (collisionRect.containsPoint(point)) {
+					bullet.kill();
+					playerHit(playerID);
+				}
+			}
 		}
 	}
 });

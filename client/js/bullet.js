@@ -13,18 +13,38 @@ tfn.Bullet = tfn.PhysicalBitmap.fastClass(function(base, baseConstructor) {
 		this.setAnchorPoint(0.5, 0.5);
 		this.ownerPlayerID = playerID;
 		
-		setTimeout(this.kill.bind(this), timeToLive);
+		// Rotate the bullet for easier collision detection.
+		this.rotation = 45;
+		
+		this.timer = setTimeout(this.kill.bind(this), timeToLive);
 	}
 	
 	this.kill = function() {
+		// Just in case we were killed by something else, remove
+		// the timeout so we don't try to remove a null object.
+		clearTimeout(this.timer);
+		
 		// Remove ourself from the parent as we're now dead!
 		this.parent.removeChild(this);
 	}
 	
 	this.tick = function() {
 		base.tick.call(this);
+				
+		var collisionDetector = new tfn.CollisionDetector(this.mapBitmap, "map");
+		var collisionEdge = collisionDetector.determineCollisionEdge(this.getCollisionRect());
 		
-		var collisionDetector = new tfn.CollisionDetector(this.getCollisionRect(), this.parent.mapBitmap, "map");
-		this.setCollisions(collisionDetector.collisions);
+		this.handlePossibleCollision(collisionDetector, collisionEdge);
+	}
+	
+	this.handlePossibleCollision = function(collisionDetector, collisionEdge) {
+		if (collisionEdge == collisionDetector.collisionEdge.RIGHT ||
+			collisionEdge == collisionDetector.collisionEdge.LEFT) {
+			this.currentVelocity.x *= -1;
+		}
+		if (collisionEdge == collisionDetector.collisionEdge.TOP ||
+			collisionEdge == collisionDetector.collisionEdge.BOTTOM) {
+			this.currentVelocity.y *= -1;
+		}
 	}
 });
