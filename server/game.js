@@ -192,7 +192,10 @@ var setEventHandlers = function() {
 
 
 function onClientUpdatePlayer(client, data){
+	var player = players[client.id];
+	if(player == undefined) return null;
 	var sessionID = players[client.id].sessionID;
+	if(sessionID == undefined) return null;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
 	player.locX = data.locX;
@@ -203,6 +206,7 @@ function onClientUpdatePlayer(client, data){
 }
 
 function onClientUpdateShots(client, data){
+	if(players[client.id] == undefined) return null;
         var sessionID = players[client.id].sessionID;
         var session = sessions[sessionID];
 	session.gameEnv.shots[client.id] = data
@@ -210,42 +214,53 @@ function onClientUpdateShots(client, data){
 }
 
 function distance(x1, y1, x2, y2){
-	return Math.sqrt( (x2-x1)^2 + (y2-y1)^2 );
+	var xs = 0;
+	var ys = 0;
+
+	xs = x2 - x1;
+	xs = xs * xs;
+	
+	ys = y2 - y1;
+	ys = ys * ys;
+
+	return Math.sqrt(xs + ys);
 }
 
 function spawnPlayerAway(player){
 	//Set player x & y to farthest point away from average. 
 
-
+	
 	avgX = 0;
         avgY = 0;
-
 	var session = sessions[player.sessionID];
-	
-	count = 0;
-	for( var p in session.gameEnv.players){
+	count = 0.00;
+	for( var pID in session.gameEnv.players){
+		p = session.gameEnv.players[pID]
 		if (p.playerID == player.playerID) continue;
+		console.log(JSON.stringify(p));
 		count = count + 1;
-		avgX = avgX + p.locX;
-		avgY = avgY + p.locY;
+		avgX = avgX + parseInt(p["locX"]);
+		avgY = avgY + parseInt(p["locY"]);
 	}
 	if(count == 0) count = count + 1;
 	avgX = avgX/count;
 	avgY = avgY/count;
-
+	console.log("avgx" + avgX + "avgY" + avgY);
 	spawn = 0;
         maxDist = 0;
 
 	for(var i = 0; i < SPAWN.length; i++){
+		console.log(JSON.stringify(SPAWN[i]));
 		var d = distance(avgX, avgY, SPAWN[i][0], SPAWN[i][1]);
+		console.log(d);
 		if(d > maxDist){ 
 			spawn = i;
 			maxDist = d;
 		}
 	}
-	
+	console.log(JSON.stringify(SPAWN[spawn]) + " " + maxDist)
 	player.locX = SPAWN[spawn][0];
-	player.locY = SPAWN[spawn][i];
+	player.locY = SPAWN[spawn][1];
 
 	return player;
 
@@ -267,6 +282,7 @@ function onClientPlayerHit(client, data){ //bad name...client indicating player 
 		hit.deaths = hit.deaths + 1;
 		hit.HP = 100;
 		hit = spawnPlayerAway(hit);
+		
 	}
 
 	gameEnv.players[client.id] = shooting;
@@ -364,7 +380,8 @@ function onClientJoinGame(client, data){
 			
 			players[client.id].playerNum = playerNum;
 			gameEnv.players[client.id].playerNum = playerNum;
-
+			players[client.id].sessionID = session_id;			
+			gameEnv.players[client.id].sessionID = session_id;
 			players[client.id].locX = SPAWN[playerNum][0];
 			players[client.id].locY = SPAWN[playerNum][1];
 
