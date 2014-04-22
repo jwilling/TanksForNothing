@@ -63,7 +63,7 @@ function GameEnv(sessionID){
 	this.players = {};
 	this.shots = {};
 	this.sessionID = sessionID;
-	this.lastEmit = new Date();
+	this.lastEmit = Date.now();
 };
 
 GameEnv.prototype.addPlayer = function(playerID){
@@ -237,7 +237,6 @@ function spawnPlayerAway(player){
 	for( var pID in session.gameEnv.players){
 		p = session.gameEnv.players[pID]
 		if (p.playerID == player.playerID) continue;
-		console.log(JSON.stringify(p));
 		count = count + 1;
 		avgX = avgX + parseInt(p["locX"]);
 		avgY = avgY + parseInt(p["locY"]);
@@ -245,20 +244,16 @@ function spawnPlayerAway(player){
 	if(count == 0) count = count + 1;
 	avgX = avgX/count;
 	avgY = avgY/count;
-	console.log("avgx" + avgX + "avgY" + avgY);
 	spawn = 0;
         maxDist = 0;
 
 	for(var i = 0; i < SPAWN.length; i++){
-		console.log(JSON.stringify(SPAWN[i]));
 		var d = distance(avgX, avgY, SPAWN[i][0], SPAWN[i][1]);
-		console.log(d);
 		if(d > maxDist){ 
 			spawn = i;
 			maxDist = d;
 		}
 	}
-	console.log(JSON.stringify(SPAWN[spawn]) + " " + maxDist)
 	player.locX = SPAWN[spawn][0];
 	player.locY = SPAWN[spawn][1];
 
@@ -267,6 +262,7 @@ function spawnPlayerAway(player){
 }
 
 function onClientPlayerHit(client, data){ //bad name...client indicating player is hit...
+	if (players[client.id] == undefined) return null;
 	var sessionID = players[client.id].sessionID;
         var session = sessions[sessionID];
 	var gameEnv = session.gameEnv
@@ -282,28 +278,26 @@ function onClientPlayerHit(client, data){ //bad name...client indicating player 
 		hit.deaths = hit.deaths + 1;
 		hit.HP = 100;
 		hit = spawnPlayerAway(hit);
-		
+		clients[hit.playerID].emit("move_to", {"locX":hit.locX, "locY": hit.locY})	
 	}
 
 	gameEnv.players[client.id] = shooting;
 	gameEnv.players[playerHitID] = hit
 	session.gameEnv = gameEnv;
 	sessions[sessionID] = session;
-
         updateGameEnvironmentsForSession(sessionID);
 }
 
 function updateGameEnvironmentsForSession(sessionID){
 	var session = sessions[sessionID];
-	var now = new Date();
-	var timeSinceLastEmit = now - session.lastEmit;
-	//if (timeSinceLastEmit > 17) {
-		//console.log("emitting game");
-		session.lastEmit = now;
+	var now = Date.now();
+	var timeSinceLastEmit = now - session.gameEnv.lastEmit;
+	if (timeSinceLastEmit > 17) {
+		session.gameEnv.lastEmit = now;
 		for (clientID in sessions[sessionID].gameEnv.players) {
 			clients[clientID].emit("update_game_env", sessions[sessionID].gameEnv);
 		}
-	//}
+	}
 }
 
 function onClientStartGame(client, data){
@@ -382,8 +376,8 @@ function onClientJoinGame(client, data){
 			gameEnv.players[client.id].playerNum = playerNum;
 			players[client.id].sessionID = session_id;			
 			gameEnv.players[client.id].sessionID = session_id;
-			players[client.id].locX = SPAWN[playerNum][0];
-			players[client.id].locY = SPAWN[playerNum][1];
+			players[client.id].locX = SPAWN[playerNum % 4][0];
+			players[client.id].locY = SPAWN[playerNum % 4][1];
 
                         gameEnv.players[client.id].locX = SPAWN[playerNum][0];
                         gameEnv.players[client.id].locY = SPAWN[playerNum][1];

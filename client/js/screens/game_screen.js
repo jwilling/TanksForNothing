@@ -64,8 +64,11 @@ tfn.GameScreen = tfn.Screen.fastClass(function(base, baseConstructor) {
 		// Bind the update callback function from the client to
 		// our update function.
 		gameEnvUpdateCallback = this.updateGameEnvironment.bind(this);
+		moveTankToCallback = this.moveTank.bind(this);
 	}
-	
+	this.moveTank = function(data){
+		this.tank.setPosition(data.locX, data.locY);
+	}	
 	this.ourTankShouldFire = function(startingX, startingY, angle, playerNumber) {
 		var colorName = this.playerColorMappings[playerNumber];
 		var bullet = new tfn.Bullet(startingX, startingY, angle, colorName);

@@ -9,7 +9,7 @@ var gameEnv;
 var gameEnvUpdateCallback = function(data){};
 var sessionUpdateCallback = function(data){};
 var startGameCallback = function(data){};
-
+var moveTankToCallback = function(data){};
 
 //Function that client calls to being hosting game.
 function clientHostGame(callback){
@@ -109,7 +109,7 @@ function Session(sessionOwner, settings){
 var client = null;
 
 function initSocket(){
-	socket = io.connect("127.0.0.1:50505");
+	socket = io.connect("tanksfornothing.us:50505");
 	client = socket;
 	setEventHandlers();
 }
@@ -131,6 +131,9 @@ var setEventHandlers = function() {
 		client.on("start_game", function(data){
 			onServerStartGame(client, data);
 		});
+		client.on("move_to", function(data){
+			onServerMoveTo(client, data);
+		});
 		client.emit("request_playerID",{});
 		//client.emit("join_game", {});
 		//client.on("player_left_game", function(data){
@@ -145,6 +148,10 @@ function onServerUpdateGameEnv(client, data){
 	gameEnv = data;
 	//console.log("game Env Recieved");
 	gameEnvUpdateCallback(gameEnv);
+}
+
+function onServerMoveTo(client, data){
+	moveTankToCallback(data);
 }
 
 function onServerUpdatePlayerID(client, data){
