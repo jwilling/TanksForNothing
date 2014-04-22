@@ -6,6 +6,13 @@ var clients = {};
 var players = {}; //maps player ids to player;
 var sessions = {};
 
+var SPAWN = [
+    [90, 90],
+    [934, 90],
+    [90, 678],
+    [934, 678],
+]
+
 //helper func to count actual size of object. 
 //taken from http://stackoverflow.com/a/6700
 Object.size = function(obj) {
@@ -56,7 +63,7 @@ function GameEnv(sessionID){
 	this.players = {};
 	this.shots = {};
 	this.sessionID = sessionID;
-	this.lastEmit = new Date();
+	this.lastEmit = Date.now();
 };
 
 GameEnv.prototype.addPlayer = function(playerID){
@@ -174,6 +181,9 @@ var setEventHandlers = function() {
 		client.on("update_shots", function(data){
                         onClientUpdateShots(client, data);
                 });
+		client.on("player_hit", function(data){
+			onClientPlayerHit(client, data);
+		});
 	});
 	socket.sockets.on("disconnect", function(client){
 		onClientExitGame(client, {});
@@ -182,7 +192,10 @@ var setEventHandlers = function() {
 
 
 function onClientUpdatePlayer(client, data){
+	var player = players[client.id];
+	if(player == undefined) return null;
 	var sessionID = players[client.id].sessionID;
+	if(sessionID == undefined) return null;
 	var session = sessions[sessionID];
 	var player = session.gameEnv.players[client.id];
 	player.locX = data.locX;
@@ -193,23 +206,98 @@ function onClientUpdatePlayer(client, data){
 }
 
 function onClientUpdateShots(client, data){
+	if(players[client.id] == undefined) return null;
         var sessionID = players[client.id].sessionID;
         var session = sessions[sessionID];
 	session.gameEnv.shots[client.id] = data
         updateGameEnvironmentsForSession(sessionID);
 }
 
+function distance(x1, y1, x2, y2){
+	var xs = 0;
+	var ys = 0;
+
+	xs = x2 - x1;
+	xs = xs * xs;
+	
+	ys = y2 - y1;
+	ys = ys * ys;
+
+	return Math.sqrt(xs + ys);
+}
+
+function spawnPlayerAway(player){
+	//Set player x & y to farthest point away from average. 
+
+	
+	avgX = 0;
+        avgY = 0;
+	var session = sessions[player.sessionID];
+	count = 0.00;
+	for( var pID in session.gameEnv.players){
+		p = session.gameEnv.players[pID]
+		if (p.playerID == player.playerID) continue;
+		count = count + 1;
+		avgX = avgX + parseInt(p["locX"]);
+		avgY = avgY + parseInt(p["locY"]);
+	}
+	if(count == 0) count = count + 1;
+	avgX = avgX/count;
+	avgY = avgY/count;
+	spawn = 0;
+        maxDist = 0;
+
+	for(var i = 0; i < SPAWN.length; i++){
+		var d = distance(avgX, avgY, SPAWN[i][0], SPAWN[i][1]);
+		if(d > maxDist){ 
+			spawn = i;
+			maxDist = d;
+		}
+	}
+	player.locX = SPAWN[spawn][0];
+	player.locY = SPAWN[spawn][1];
+
+	return player;
+
+}
+
+function onClientPlayerHit(client, data){ //bad name...client indicating player is hit...
+	if (players[client.id] == undefined) return null;
+	var sessionID = players[client.id].sessionID;
+        var session = sessions[sessionID];
+	var gameEnv = session.gameEnv
+	var playerHitID = data["hit"];
+	var shooting = gameEnv.players[client.id];
+	var hit = gameEnv.players[playerHitID];
+
+	var SHOT_DAMAGE = 25;
+
+	hit.HP = hit.HP - SHOT_DAMAGE;
+        if (hit.HP <= 0) {
+		shooting.kills = shooting.kills + 1;
+		hit.deaths = hit.deaths + 1;
+		hit.HP = 100;
+		hit = spawnPlayerAway(hit);
+		clients[hit.playerID].emit("move_to", {"locX":hit.locX, "locY": hit.locY})	
+	}
+
+	gameEnv.players[client.id] = shooting;
+	gameEnv.players[playerHitID] = hit
+	session.gameEnv = gameEnv;
+	sessions[sessionID] = session;
+        updateGameEnvironmentsForSession(sessionID);
+}
+
 function updateGameEnvironmentsForSession(sessionID){
 	var session = sessions[sessionID];
-	var now = new Date();
-	var timeSinceLastEmit = now - session.lastEmit;
-	//if (timeSinceLastEmit > 17) {
-		//console.log("emitting game");
-		session.lastEmit = now;
+	var now = Date.now();
+	var timeSinceLastEmit = now - session.gameEnv.lastEmit;
+	if (timeSinceLastEmit > 17) {
+		session.gameEnv.lastEmit = now;
 		for (clientID in sessions[sessionID].gameEnv.players) {
 			clients[clientID].emit("update_game_env", sessions[sessionID].gameEnv);
 		}
-	//}
+	}
 }
 
 function onClientStartGame(client, data){
@@ -281,10 +369,19 @@ function onClientJoinGame(client, data){
 			players[client.id].sessionID = session_id;
 			var playerNum = 0;
 			for(var id in gameEnv.players){ playerNum = playerNum + 1; }
-			
+				
 			gameEnv.addPlayer(client.id);
+			
 			players[client.id].playerNum = playerNum;
-			gameEnv.players[client.id].playerNum = playerNum
+			gameEnv.players[client.id].playerNum = playerNum;
+			players[client.id].sessionID = session_id;			
+			gameEnv.players[client.id].sessionID = session_id;
+			players[client.id].locX = SPAWN[playerNum % 4][0];
+			players[client.id].locY = SPAWN[playerNum % 4][1];
+
+                        gameEnv.players[client.id].locX = SPAWN[playerNum][0];
+                        gameEnv.players[client.id].locY = SPAWN[playerNum][1];
+
 			session.gamEnv = gameEnv;
 			var player_count = 0;
 			for(var pid in gameEnv.players){
