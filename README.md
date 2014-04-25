@@ -1,4 +1,6 @@
-TanksForNothing
+Tanks For Nothing
 ===============
 
-Class project for CSCE 315.
+A multiplayer shooting game built as a class project for CSCE 315.
+
+![](http://i.imgur.com/61fjJWQ.png)
